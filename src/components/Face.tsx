@@ -1,12 +1,13 @@
 import React, { useMemo, useState } from "react";
 import * as THREE from "three";
+import { a } from "@react-spring/three"; // Import animated components
 
 type FaceProps = {
   id: string;
   geometry: THREE.BufferGeometry;
   position: [number, number, number];
   rotation?: [number, number, number];
-  color: string;
+  color: any; // Accept SpringValue<string> or string
   selectedFace: string | null;
   onSelect: (id: string) => void;
 };
@@ -46,19 +47,21 @@ export const Face = React.memo(function Face({
         setHovered(false);
       }}
     >
-      <meshPhysicalMaterial
-        color={color}
-        transmission={0.8}
+      {/* Use a.meshPhysicalMaterial for realistic transparency */}
+      <a.meshPhysicalMaterial
+        color={color} // Accept SpringValue<string> directly
+        transmission={0.9} // Simulate glass-like transparency
         transparent
-        opacity={1}
-        roughness={0.05}
+        opacity={0.8} // Adjust opacity for overlapping effect
+        roughness={0.1} // Slight roughness for realism
         metalness={0}
-        ior={1.1}
-        thickness={0.3}
-        clearcoat={0.85}
+        ior={1.5} // Index of refraction for acrylic
+        thickness={0.2} // Simulate thickness of acrylic
+        clearcoat={0.9} // Add a clear coat for shine
         clearcoatRoughness={0.05}
+        blending={THREE.NormalBlending} // Enable blending for overlapping
       />
-      {(isSelected || hovered) && (
+      {(isSelected) && (
         <lineSegments geometry={edges}>
           <lineBasicMaterial color="yellow" />
         </lineSegments>
