@@ -1,10 +1,21 @@
 'use client'
 
 import { useState } from "react";
+import Header from "@/components/ui/Header";
+import SideBar from "@/components/ui/SideBar";
 import SPKR from "@/components/Speaker";
 
 export default function Home() {
-  const [speakerState, setSpeakerState] = useState({ rotation: 0, color: "orange" });
+  const [speakerState, setSpeakerState] = useState({ 
+    rotation: 0, 
+    color: "orange",
+    volume: 50,
+    bass: 50,
+    treble: 50,
+    currentPreset: "Default",
+    faceColors: {} as { [key: string]: string }
+  });
+  const [selectedFace, setSelectedFace] = useState<string | null>(null);
 
   const rotateSpeaker = () => {
     setSpeakerState((prev) => ({ ...prev, rotation: prev.rotation + Math.PI / 4 }));
@@ -14,100 +25,176 @@ export default function Home() {
     setSpeakerState((prev) => ({ ...prev, color }));
   };
 
-  const changeFaceColor = (color: string, face:string) => {
-    setSpeakerState((prev) => ({ ...prev,[face]: color }));
+  const changeFaceColor = (color: string, face: string) => {
+    setSpeakerState((prev) => {
+      const newFaceColors = { ...prev.faceColors };
+      if (color) {
+        newFaceColors[face] = color;
+      } else {
+        delete newFaceColors[face];
+      }
+      return { ...prev, faceColors: newFaceColors };
+    });
+  };
 
-  }
-  const colors = ["blue", "green", "orange", "red", "purple", "yellow"];
+  const handleFaceSelect = (faceId: string) => {
+    setSelectedFace(faceId);
+    console.log(`Face selected: ${faceId}`);
+  };
+
+  // New handler functions for extended functionality
+  const handleVolumeChange = (volume: number) => {
+    setSpeakerState((prev) => ({ ...prev, volume }));
+    console.log(`Volume changed to: ${volume}%`);
+  };
+
+  const handleBassChange = (bass: number) => {
+    setSpeakerState((prev) => ({ ...prev, bass }));
+    console.log(`Bass changed to: ${bass}%`);
+  };
+
+  const handleTrebleChange = (treble: number) => {
+    setSpeakerState((prev) => ({ ...prev, treble }));
+    console.log(`Treble changed to: ${treble}%`);
+  };
+
+  const handlePresetSelect = (preset: string) => {
+    setSpeakerState((prev) => ({ ...prev, currentPreset: preset }));
+    console.log(`Preset selected: ${preset}`);
+    // Apply preset-specific audio settings
+    switch (preset) {
+      case "Rock":
+        setSpeakerState((prev) => ({ ...prev, bass: 70, treble: 60 }));
+        break;
+      case "Jazz":
+        setSpeakerState((prev) => ({ ...prev, bass: 40, treble: 55 }));
+        break;
+      case "Classical":
+        setSpeakerState((prev) => ({ ...prev, bass: 30, treble: 70 }));
+        break;
+      case "Electronic":
+        setSpeakerState((prev) => ({ ...prev, bass: 80, treble: 65 }));
+        break;
+      case "Bass Boost":
+        setSpeakerState((prev) => ({ ...prev, bass: 90, treble: 45 }));
+        break;
+      default:
+        setSpeakerState((prev) => ({ ...prev, bass: 50, treble: 50 }));
+    }
+  };
+
+  const handleSavePreset = (name: string) => {
+    const preset = {
+      name,
+      settings: {
+        volume: speakerState.volume,
+        bass: speakerState.bass,
+        treble: speakerState.treble,
+        color: speakerState.color
+      }
+    };
+    console.log("Saving preset:", preset);
+    // TODO: Implement preset saving to localStorage or backend
+  };
+
+  const handleExportSettings = () => {
+    const settings = {
+      speakerState,
+      timestamp: new Date().toISOString(),
+      version: "1.0"
+    };
+    const blob = new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `spkr-settings-${Date.now()}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImportSettings = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const settings = JSON.parse(e.target?.result as string);
+        if (settings.speakerState) {
+          setSpeakerState(settings.speakerState);
+          console.log("Settings imported successfully");
+        }
+      } catch (error) {
+        console.error("Error importing settings:", error);
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  // Header callback functions
+  const handleSettingsToggle = () => {
+    console.log("Settings panel toggled");
+    // TODO: Implement settings modal
+  };
+
+  const handleThemeToggle = () => {
+    console.log("Theme toggled");
+    // TODO: Implement theme switching
+  };
+
+  const handleNotificationToggle = () => {
+    console.log("Notifications toggled");
+    // TODO: Implement notification panel
+  };
 
 
   return (
-    <div className="h-screen flex flex-col bg-gray-900 text-gray-100">
+    <div className="h-screen flex flex-col bg-gradient-to-br from-gray-900 via-gray-800 to-black text-gray-100">
       {/* Header */}
-      <header className="bg-gray-800 shadow-md">
-        <div className="container mx-auto flex items-center justify-between p-4">
-          <h1 className="text-2xl font-bold">Dashboard</h1>
-          <nav className="hidden sm:flex space-x-4">
-            <a href="#" className="hover:text-gray-400 transition">Home</a>
-            <a href="#" className="hover:text-gray-400 transition">About</a>
-            <a href="#" className="hover:text-gray-400 transition">Contact</a>
-          </nav>
-        </div>
-      </header>
+      <Header 
+        onSettingsToggle={handleSettingsToggle}
+        onThemeToggle={handleThemeToggle}
+        onNotificationToggle={handleNotificationToggle}
+      />
 
       {/* Main Content */}
-      <div className="flex flex-1 flex-col sm:flex-row">
+      <div className="flex flex-1 flex-col sm:flex-row overflow-hidden">
         {/* Sidebar */}
-        <aside className="w-full sm:w-1/4 bg-gray-800 border-r border-gray-700">
-          <nav className="p-4">
-            <ul className="space-y-3">
-              <li>
-                <button
-                  onClick={rotateSpeaker}
-                  className="block w-full p-3 rounded-lg bg-gray-700 hover:bg-gray-600 transition"
-                >
-                  Rotate Speaker
-                </button>
-              </li>
-
-              <div className="mt-6">
-              <h2 className="text-lg font-semibold mb-4">Customize Color</h2>
-              <div className="grid grid-cols-3 gap-2">
-              {colors.map((color) => (
-                <button
-                  key={color}
-                  onClick={() => changeSpeakerColor(color)}
-                  className={`w-10 h-10 ring-1 ring-white transition ${
-                    color === "blue" ? "bg-blue-700 hover:bg-blue-600" :
-                    color === "green" ? "bg-green-700 hover:bg-green-600" :
-                    color === "orange" ? "bg-orange-700 hover:bg-orange-600" :
-                    color === "red" ? "bg-red-700 hover:bg-red-600" :
-                    color === "purple" ? "bg-purple-700 hover:bg-purple-600" :
-                    color === "yellow" ? "bg-yellow-700 hover:bg-yellow-600" :
-                    color === "pink" ? "bg-pink-700 hover:bg-pink-600" :
-                    color === "teal" ? "bg-teal-700 hover:bg-teal-600" :
-                    "bg-gray-700 hover:bg-gray-600"
-                  }`}
-                  title={`Change to ${color}`}
-                />
-              ))}
-            </div>
-              </div>
-
-
-              <div className="mt-6">
-              <h2 className="text-lg font-semibold mb-4">Customize Individual Face Color</h2>
-              <div className="grid grid-cols-3 gap-2">
-              {colors.map((color) => (
-                <button
-                  key={color}
-                  onClick={() => changeFaceColor(color,"front")}
-                  className={`w-10 h-10 ring-1 ring-white transition ${
-                    color === "blue" ? "bg-blue-700 hover:bg-blue-600" :
-                    color === "green" ? "bg-green-700 hover:bg-green-600" :
-                    color === "orange" ? "bg-orange-700 hover:bg-orange-600" :
-                    color === "red" ? "bg-red-700 hover:bg-red-600" :
-                    color === "purple" ? "bg-purple-700 hover:bg-purple-600" :
-                    color === "yellow" ? "bg-yellow-700 hover:bg-yellow-600" :
-                    color === "pink" ? "bg-pink-700 hover:bg-pink-600" :
-                    color === "teal" ? "bg-teal-700 hover:bg-teal-600" :
-                    "bg-gray-700 hover:bg-gray-600"
-                  }`}
-                  title={`Change to ${color}`}
-                />
-              ))}
-            </div>
-              </div>
-
-
-            </ul>
-          </nav>
-        </aside>
+        <SideBar 
+          onRotateSpeaker={rotateSpeaker}
+          onChangeSpeakerColor={changeSpeakerColor}
+          onChangeFaceColor={changeFaceColor}
+          onVolumeChange={handleVolumeChange}
+          onBassChange={handleBassChange}
+          onTrebleChange={handleTrebleChange}
+          onPresetSelect={handlePresetSelect}
+          onSavePreset={handleSavePreset}
+          onExportSettings={handleExportSettings}
+          onImportSettings={handleImportSettings}
+          selectedFace={selectedFace}
+          currentFaceColors={speakerState.faceColors}
+        />
 
         {/* Main Scene */}
-        <main className="flex-1 bg-gray-900 relative">
+        <main className="flex-1 bg-gradient-to-br from-gray-900 to-black relative overflow-hidden">
           <div className="absolute inset-0">
-            <SPKR speakerState={speakerState} />
+            <SPKR 
+              speakerState={speakerState} 
+              onFaceSelect={handleFaceSelect}
+            />
+          </div>
+          
+          {/* Status Bar */}
+          <div className="absolute bottom-4 left-4 right-4 bg-black/20 backdrop-blur-sm rounded-lg p-4 border border-gray-700/50">
+            <div className="flex justify-between items-center text-sm">
+              <div className="flex space-x-4">
+                <span className="text-gray-300">Preset: <span className="text-blue-400 font-medium">{speakerState.currentPreset}</span></span>
+                <span className="text-gray-300">Volume: <span className="text-green-400 font-medium">{speakerState.volume}%</span></span>
+                <span className="text-gray-300">Bass: <span className="text-orange-400 font-medium">{speakerState.bass}%</span></span>
+                <span className="text-gray-300">Treble: <span className="text-purple-400 font-medium">{speakerState.treble}%</span></span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <span className="text-green-400 font-medium">Connected</span>
+              </div>
+            </div>
           </div>
         </main>
       </div>

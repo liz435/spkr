@@ -8,7 +8,17 @@ function createEdges(geometry: THREE.BufferGeometry) {
   return new THREE.EdgesGeometry(geometry);
 }
 
-export function FaceBox({ rotation, color }: { rotation: number; color: string }) {
+export function FaceBox({ 
+  rotation, 
+  color, 
+  faceColors, 
+  onFaceSelect 
+}: { 
+  rotation: number; 
+  color: string;
+  faceColors?: { [key: string]: string };
+  onFaceSelect?: (faceId: string) => void;
+}) {
   const [selectedFace, setSelectedFace] = useState<string | null>(null);
 
   const size = 2;
@@ -17,8 +27,14 @@ export function FaceBox({ rotation, color }: { rotation: number; color: string }
   // Smooth color transition using react-spring
   const spring = useSpring({
     color,
-    config: { duration: 500 }, // Adjust duration for smoother transitions
+    config: { duration: 500 },
   });
+
+  const handleFaceSelect = (faceId: string) => {
+    setSelectedFace(faceId);
+    onFaceSelect?.(faceId);
+    console.log(`Selected face: ${faceId}`);
+  };
 
   const frontGeometry = useMemo(() => {
     const boxGeom = new THREE.BoxGeometry(1.9, 1.7, thickness);
@@ -63,10 +79,11 @@ return (
           <Face
             id={id}
             geometry={geometry}
-            position={[0, 0, 0]} // Reset position inside the Face component
-            color={spring.color} // Pass the SpringValue directly
+            position={[0, 0, 0]}
+            color={spring.color}
             selectedFace={selectedFace}
-            onSelect={setSelectedFace}
+            onSelect={handleFaceSelect}
+            faceColor={faceColors?.[id]}
           />
         </a.group>
       ))}

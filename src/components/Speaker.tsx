@@ -20,7 +20,17 @@ export function Model({ url }: { url: string;}) {
 }
 
 
-export default function SPKR({ speakerState }: { speakerState: { rotation: number; color: string } }) {
+export default function SPKR({ 
+  speakerState, 
+  onFaceSelect 
+}: { 
+  speakerState: { 
+    rotation: number; 
+    color: string;
+    faceColors?: { [key: string]: string };
+  };
+  onFaceSelect?: (faceId: string) => void;
+}) {
   return (
     <Canvas
       camera={{ position: [5, 5, 5], fov: 45 }}
@@ -28,11 +38,16 @@ export default function SPKR({ speakerState }: { speakerState: { rotation: numbe
         gl.outputColorSpace = THREE.SRGBColorSpace;
         gl.toneMapping = THREE.ACESFilmicToneMapping;
       }}
-      style={{ height: "100vh", background: "linear-gradient(to top, #1e3a8a, #1e40af, #1e3a8a, #0f172a)" }}
+      style={{ height: "100vh", background: "linear-gradient(to top, #43a565ff, #1eaf51ff, #6cb67bff, #0d7d07ff)" }}
     >
       <ambientLight intensity={0.7} />
       <pointLight position={[10, 10, 10]} intensity={60} />
-      <FaceBox rotation={speakerState.rotation} color={speakerState.color} />
+      <FaceBox 
+        rotation={speakerState.rotation} 
+        color={speakerState.color}
+        faceColors={speakerState.faceColors}
+        onFaceSelect={onFaceSelect}
+      />
       <Model url="/concret.glb"/>
       <OrbitControls />
       {/* <Environment preset="city" background /> */}
