@@ -16,6 +16,7 @@ export default function Home() {
     faceColors: {} as { [key: string]: string }
   });
   const [selectedFace, setSelectedFace] = useState<string | null>(null);
+  const [hoveredFace, setHoveredFace] = useState<string | null>(null);
 
   const rotateSpeaker = () => {
     setSpeakerState((prev) => ({ ...prev, rotation: prev.rotation + Math.PI / 4 }));
@@ -38,8 +39,20 @@ export default function Home() {
   };
 
   const handleFaceSelect = (faceId: string) => {
-    setSelectedFace(faceId);
-    console.log(`Face selected: ${faceId}`);
+    if (faceId === '') {
+      setSelectedFace(null);
+      console.log('Face deselected');
+    } else {
+      setSelectedFace(faceId);
+      console.log(`Face selected: ${faceId}`);
+    }
+  };
+
+  const handleFaceHover = (faceId: string | null) => {
+    setHoveredFace(faceId);
+    if (faceId) {
+      console.log(`Face hovered: ${faceId}`);
+    }
   };
 
   // New handler functions for extended functionality
@@ -170,6 +183,8 @@ export default function Home() {
           onImportSettings={handleImportSettings}
           selectedFace={selectedFace}
           currentFaceColors={speakerState.faceColors}
+          onFaceSelect={handleFaceSelect}
+          onFaceHover={handleFaceHover}
         />
 
         {/* Main Scene */}
@@ -178,6 +193,7 @@ export default function Home() {
             <SPKR 
               speakerState={speakerState} 
               onFaceSelect={handleFaceSelect}
+              hoveredFace={hoveredFace}
             />
           </div>
           

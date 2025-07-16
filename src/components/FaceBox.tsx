@@ -1,8 +1,8 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import * as THREE from "three";
 import { CSG } from "three-csg-ts";
 import Face from "@/components/Face";
-import { useSpring, a } from "@react-spring/three"; 
+import { useSpring, a } from "@react-spring/three";
 
 function createEdges(geometry: THREE.BufferGeometry) {
   return new THREE.EdgesGeometry(geometry);
@@ -12,12 +12,14 @@ export function FaceBox({
   rotation, 
   color, 
   faceColors, 
-  onFaceSelect 
+  onFaceSelect,
+  hoveredFace 
 }: { 
   rotation: number; 
   color: string;
   faceColors?: { [key: string]: string };
   onFaceSelect?: (faceId: string) => void;
+  hoveredFace?: string | null;
 }) {
   const [selectedFace, setSelectedFace] = useState<string | null>(null);
 
@@ -30,15 +32,58 @@ export function FaceBox({
     config: { duration: 500 },
   });
 
+  // Handle external deselection (when clicking outside)
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      
+      // Check if clicking on sidebar or other UI elements
+      if (target.closest('aside') || target.closest('header') || target.closest('nav') || target.closest('button')) {
+        return; // Don't deselect if clicking on UI elements
+      }
+      
+      // Check if clicking on the canvas but not on a face
+      if (target.tagName === 'CANVAS') {
+        // Let the background plane handle canvas clicks
+        return;
+      }
+      
+      // If clicking completely outside the 3D area, deselect
+      if (!target.closest('main') && selectedFace) {
+        setSelectedFace(null);
+        onFaceSelect?.('');
+        console.log('Face deselected by clicking outside main area');
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [selectedFace, onFaceSelect]);
+
   const handleFaceSelect = (faceId: string) => {
-    setSelectedFace(faceId);
-    onFaceSelect?.(faceId);
-    console.log(`Selected face: ${faceId}`);
+    // If empty string is passed, deselect
+    if (faceId === '') {
+      setSelectedFace(null);
+      onFaceSelect?.('');
+      console.log('Face deselected');
+      return;
+    }
+    
+    // If the same face is clicked again, deselect it
+    if (selectedFace === faceId) {
+      setSelectedFace(null);
+      onFaceSelect?.('');
+      console.log(`Face ${faceId} deselected`);
+    } else {
+      setSelectedFace(faceId);
+      onFaceSelect?.(faceId);
+      console.log(`Selected face: ${faceId}`);
+    }
   };
 
   const frontGeometry = useMemo(() => {
     const boxGeom = new THREE.BoxGeometry(1.9, 1.7, thickness);
-    const holeGeom = new THREE.CylinderGeometry(0.3, 0.3, thickness + 0.01, 32);
+    const holeGeom = new THREE.CylinderGeometry(0.35, 0.35, thickness + 0.01, 32);
     holeGeom.rotateX(Math.PI / 2);
     const boxMesh = new THREE.Mesh(boxGeom);
     const holeMesh = new THREE.Mesh(holeGeom);
@@ -74,6 +119,24 @@ export function FaceBox({
 
 return (
     <group rotation={[0, rotation, 0]}>
+      {/* Invisible bounding box for better click detection */}
+      <mesh
+        position={[0, 0, 0]}
+        scale={[size + 0.2, size + 0.2, size + 0.2]}
+        onClick={(e) => {
+          e.stopPropagation();
+          // Only deselect if clicking on the bounding box but not on a face
+          if (selectedFace) {
+            setSelectedFace(null);
+            onFaceSelect?.('');
+            console.log('Deselected by clicking bounding box');
+          }
+        }}
+      >
+        <boxGeometry />
+        <meshBasicMaterial transparent opacity={0} />
+      </mesh>
+      
       {faces.map(({ id, geometry, position }) => (
         <a.group key={id} position={position as [number, number, number]}>
           <Face
@@ -84,6 +147,7 @@ return (
             selectedFace={selectedFace}
             onSelect={handleFaceSelect}
             faceColor={faceColors?.[id]}
+            hoveredFace={hoveredFace}
           />
         </a.group>
       ))}
