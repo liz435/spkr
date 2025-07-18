@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from "react";
-import Header from "@/components/ui/Header";
-import SideBar from "@/components/ui/SideBar";
+import FloatingHeader from "@/components/ui/FloatingHeader";
+import FloatingCards from "@/components/ui/FloatingCards";
 import SPKR from "@/components/Speaker";
 
 export default function Home() {
@@ -160,35 +160,10 @@ export default function Home() {
 
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-gray-900 via-gray-800 to-black text-gray-100">
-      {/* Header */}
-      <Header 
-        onSettingsToggle={handleSettingsToggle}
-        onThemeToggle={handleThemeToggle}
-        onNotificationToggle={handleNotificationToggle}
-      />
-
       {/* Main Content */}
-      <div className="flex flex-1 flex-col sm:flex-row overflow-hidden">
-        {/* Sidebar */}
-        <SideBar 
-          onRotateSpeaker={rotateSpeaker}
-          onChangeSpeakerColor={changeSpeakerColor}
-          onChangeFaceColor={changeFaceColor}
-          onVolumeChange={handleVolumeChange}
-          onBassChange={handleBassChange}
-          onTrebleChange={handleTrebleChange}
-          onPresetSelect={handlePresetSelect}
-          onSavePreset={handleSavePreset}
-          onExportSettings={handleExportSettings}
-          onImportSettings={handleImportSettings}
-          selectedFace={selectedFace}
-          currentFaceColors={speakerState.faceColors}
-          onFaceSelect={handleFaceSelect}
-          onFaceHover={handleFaceHover}
-        />
-
+      <div className="flex-1 overflow-hidden">
         {/* Main Scene */}
-        <main className="flex-1 bg-gradient-to-br from-gray-900 to-black relative overflow-hidden">
+        <main className="h-full bg-gradient-to-br from-gray-900 to-black relative overflow-hidden">
           <div className="absolute inset-0">
             <SPKR 
               speakerState={speakerState} 
@@ -196,6 +171,23 @@ export default function Home() {
               hoveredFace={hoveredFace}
             />
           </div>
+
+          {/* Floating Header */}
+          <FloatingHeader 
+            onSettingsToggle={handleSettingsToggle}
+            onThemeToggle={handleThemeToggle}
+            onNotificationToggle={handleNotificationToggle}
+          />
+
+          {/* Floating Cards */}
+          <FloatingCards 
+            onChangeSpeakerColor={changeSpeakerColor}
+            onChangeFaceColor={changeFaceColor}
+            selectedFace={selectedFace}
+            currentFaceColors={speakerState.faceColors}
+            onFaceSelect={handleFaceSelect}
+            onFaceHover={handleFaceHover}
+          />
           
           {/* Status Bar */}
           <div className="absolute bottom-4 left-4 right-4 bg-black/20 backdrop-blur-sm rounded-lg p-4 border border-gray-700/50">
@@ -206,8 +198,11 @@ export default function Home() {
                 <span className="text-gray-300">Bass: <span className="text-orange-400 font-medium">{speakerState.bass}%</span></span>
                 <span className="text-gray-300">Treble: <span className="text-purple-400 font-medium">{speakerState.treble}%</span></span>
               </div>
+
               <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse">
+
+                </div>
                 <span className="text-green-400 font-medium">Connected</span>
               </div>
             </div>

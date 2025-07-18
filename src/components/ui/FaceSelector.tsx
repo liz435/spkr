@@ -44,9 +44,9 @@ const FaceSelector: React.FC<FaceSelectorProps> = ({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 w-[16rem]">
       {/* Face Selection Buttons */}
-      <div className="bg-gray-800 rounded-lg p-4">
+      <div className=" rounded-lg p-4">
         <h3 className="text-md font-semibold text-white mb-3">Select Face</h3>
         <div className="grid grid-cols-2 gap-2">
           {faces.map((face) => (
@@ -77,11 +77,11 @@ const FaceSelector: React.FC<FaceSelectorProps> = ({
       </div>
 
       {/* Face Color Customization */}
-      <div className="bg-gray-800 rounded-lg p-4">
+      <div className=" rounded-lg p-4">
         <h3 className="text-md font-semibold text-white mb-3">Face Color</h3>
         {selectedFace ? (
           <div className="space-y-3">
-            <div className="bg-gray-700 rounded-lg p-3">
+            <div className=" rounded-lg p-3">
               <p className="text-sm text-gray-300 mb-2">
                 Selected Face: <span className="text-blue-400 font-medium capitalize">{selectedFace}</span>
               </p>
