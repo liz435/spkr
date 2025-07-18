@@ -43,9 +43,9 @@ const FloatingCards: React.FC<FloatingCardsProps> = ({
   ];
 
   return (
-    <div className="absolute inset-0 pointer-events-none">
-      {/* Spotify Player Card - Top Left */}
-      <div className="absolute top-26 right-6 w-[28rem] bg-black/20 backdrop-blur-md rounded-2xl p-4 border border-white/10 shadow-2xl pointer-events-auto ">
+    <div className="absolute inset-0 z-40 pointer-events-none">
+      {/* Spotify Player Card - Top Right on desktop, Top on mobile */}
+      <div className="absolute top-6 md:top-26 right-2 md:right-6 w-[calc(100vw-1rem)] md:w-[28rem] max-w-md md:max-w-none bg-black/20 backdrop-blur-md rounded-2xl p-3 md:p-4 border border-white/10 shadow-2xl pointer-events-auto">
         <div className="text-white text-sm font-medium mb-3 flex items-center gap-2">
           <span className="animate-pulse text-green-400">●</span>
           Now Playing
@@ -57,7 +57,7 @@ const FloatingCards: React.FC<FloatingCardsProps> = ({
             <button
               key={type}
               onClick={() => setEmbedType(type)}
-              className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+              className={`px-2 md:px-3 py-1 rounded-full text-xs font-medium transition-all ${
                 embedType === type 
                   ? 'bg-green-500 text-black' 
                   : 'bg-white/10 text-white/70 hover:bg-white/20'
@@ -73,18 +73,18 @@ const FloatingCards: React.FC<FloatingCardsProps> = ({
           <iframe
             src={`https://open.spotify.com/embed/${embedType}/${spotifyContent[embedType]}?utm_source=generator&theme=0`}
             width="100%"
-            height="200"
+            height="160"
             frameBorder="0"
             allowFullScreen={false}
             allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
             loading="lazy"
-            className="rounded-xl"
+            className="rounded-xl md:h-[160px]"
           />
         </div>
       </div>
 
-      {/* Face Selector Card - Top Left (Transparent) */}
-      <div className="absolute left-4 top-32 bg-black/20 backdrop-blur-sm rounded-2xl p-4 border border-white/20 shadow-xl pointer-events-auto">
+      {/* Face Selector Card - Left on desktop, Bottom Left on mobile */}
+      <div className="absolute left-2 md:left-4 bottom-32 md:bottom-auto md:top-32 bg-black/20 backdrop-blur-sm rounded-2xl p-3 md:p-4 border border-white/20 shadow-xl pointer-events-auto">
         <FaceSelector
           selectedFace={selectedFace || null}
           onFaceSelect={handleFaceSelect}
@@ -94,19 +94,19 @@ const FloatingCards: React.FC<FloatingCardsProps> = ({
         />
       </div>
 
-      {/* Speaker Controls Card - Bottom Right */}
-      <div className="absolute bottom-20 right-6 w-64 bg-black/20 backdrop-blur-md rounded-2xl p-4 border border-white/10 shadow-2xl pointer-events-auto">
-        <div className="text-white text-sm font-medium mb-4">Speaker Colors</div>
+      {/* Speaker Controls Card - Bottom Right on all screens */}
+      <div className="absolute bottom-16 md:bottom-20 right-2 md:right-6 w-52 md:w-64 bg-black/20 backdrop-blur-md rounded-2xl p-3 md:p-4 border border-white/10 shadow-2xl pointer-events-auto">
+        <div className="text-white text-sm font-medium mb-3 md:mb-4">Speaker Colors</div>
         
         {/* Color Selector */}
         <div>
-          <div className="text-xs text-white/70 mb-3">Choose a color for your speaker</div>
-          <div className="grid grid-cols-4 gap-2">
+          <div className="text-xs text-white/70 mb-2 md:mb-3">Choose a color</div>
+          <div className="grid grid-cols-3 md:grid-cols-4 gap-1.5 md:gap-2">
             {colors.map((color) => (
               <button
                 key={color.name}
                 onClick={() => onChangeSpeakerColor(color.name)}
-                className={`w-12 h-12 rounded-lg ${color.class} ${color.hover} transition-all duration-200 transform hover:scale-110 active:scale-95 shadow-lg border-2 border-white/20 hover:border-white/40`}
+                className={`w-10 h-10 md:w-12 md:h-12 rounded-lg ${color.class} ${color.hover} transition-all duration-200 transform hover:scale-110 active:scale-95 shadow-lg border-2 border-white/20 hover:border-white/40`}
                 title={`Change speaker to ${color.name}`}
               />
             ))}

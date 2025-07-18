@@ -24,7 +24,7 @@ export function FaceBox({
   const [selectedFace, setSelectedFace] = useState<string | null>(null);
 
   const size = 2;
-  const thickness = 0.1;
+  const thickness = 0.05; // 更薄的板材厚度
 
   // Smooth color transition using react-spring
   const spring = useSpring({
@@ -109,12 +109,12 @@ export function FaceBox({
   const topBottomGeometry = useMemo(() => new THREE.BoxGeometry(1.9, thickness, 2), []);
 
   const faces = [
-    { id: "front", geometry: frontGeometry, position: [0, 0.05, size / 2 - 0.05] },
-    { id: "back", geometry: backGeometry, position: [0, 0.05, -size / 2 + 0.05] },
-    { id: "left", geometry: sideGeometry, position: [-size / 2, 0, 0] },
-    { id: "right", geometry: sideGeometry, position: [size / 2, 0, 0] },
-    { id: "top", geometry: topBottomGeometry, position: [0, size / 2 - 0.05, 0] },
-    { id: "bottom", geometry: topBottomGeometry, position: [0, -size / 2 + 0.15, 0] },
+    { id: "front", geometry: frontGeometry, position: [0, 0.1, size / 2 - thickness/2] },
+    { id: "back", geometry: backGeometry, position: [0, 0.1, -size / 2 + thickness/2] },
+    { id: "left", geometry: sideGeometry, position: [-size / 2 + thickness/2, 0, 0] },
+    { id: "right", geometry: sideGeometry, position: [size / 2 - thickness/2, 0, 0] },
+    { id: "top", geometry: topBottomGeometry, position: [0, size / 2 - thickness/2, 0] },
+    { id: "bottom", geometry: topBottomGeometry, position: [0, -size / 2 + thickness/2 +0.2, 0] },
   ];
 
 return (

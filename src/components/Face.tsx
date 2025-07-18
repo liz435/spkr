@@ -27,7 +27,38 @@ export const Face = React.memo(function Face({
 }: FaceProps) {
   const [hovered, setHovered] = useState(false);
 
-  const edges = useMemo(() => new THREE.EdgesGeometry(geometry.clone()), [geometry]);
+  // Create simple outline for face selection highlighting
+  const outlineEdges = useMemo(() => {
+    // Instead of using complex edge detection, create a simple wireframe outline
+    // that represents the face boundary regardless of internal holes
+    
+    // Get the bounding box of the face geometry
+    const bbox = new THREE.Box3().setFromBufferAttribute(
+      geometry.attributes.position as THREE.BufferAttribute
+    );
+    
+    const { min, max } = bbox;
+    
+    // Create a simple rectangular outline based on the bounding box
+    const outlinePositions = [
+      // Bottom edge
+      min.x, min.y, min.z,  max.x, min.y, min.z,
+      // Right edge
+      max.x, min.y, min.z,  max.x, max.y, max.z,
+      // Top edge  
+      max.x, max.y, max.z,  min.x, max.y, max.z,
+      // Left edge
+      min.x, max.y, max.z,  min.x, min.y, min.z
+    ];
+    
+    const outlineGeometry = new THREE.BufferGeometry();
+    outlineGeometry.setAttribute(
+      'position', 
+      new THREE.Float32BufferAttribute(outlinePositions, 3)
+    );
+    
+    return outlineGeometry;
+  }, [geometry]);
 
   const isSelected = selectedFace === id;
   const isHoveredFromSidebar = hoveredFace === id;
@@ -87,29 +118,30 @@ export const Face = React.memo(function Face({
       >
         <a.meshPhysicalMaterial
           color={faceColor ? faceColorSpring : color}
-          transmission={0.9}
-          transparent
-          opacity={opacity}
-          roughness={0.1}
+          transmission={1}            // 全透光
+          transparent={true}
+          opacity={1}                 // 设置为 1 因为 transmission 会控制透明度
+          roughness={0.2}             // 更毛玻璃
           metalness={0}
-          ior={1.5}
-          thickness={0.2}
-          clearcoat={0.9}
-          clearcoatRoughness={0.05}
+          ior={1.5}                  // 更接近亚克力塑料
+          thickness={0.5}             // 更厚折射效果更明显
+          clearcoat={1}
+          clearcoatRoughness={0.1}
+          envMapIntensity={1.5}
           blending={THREE.NormalBlending}
         />
         {isSelected && (
-          <lineSegments geometry={edges}>
+          <lineSegments geometry={outlineEdges}>
             <lineBasicMaterial color="#00ff00" linewidth={3} />
           </lineSegments>
         )}
         {hovered && !isSelected && (
-          <lineSegments geometry={edges}>
+          <lineSegments geometry={outlineEdges}>
             <lineBasicMaterial color="#ffff00" linewidth={2} opacity={0.7} transparent />
           </lineSegments>
         )}
         {isHoveredFromSidebar && !isSelected && !hovered && (
-          <lineSegments geometry={edges}>
+          <lineSegments geometry={outlineEdges}>
             <lineBasicMaterial color="#00aaff" linewidth={2} opacity={0.8} transparent />
           </lineSegments>
         )}

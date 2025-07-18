@@ -4,6 +4,7 @@ import { useRef, useEffect } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls,Environment, Fisheye  } from "@react-three/drei";
 import  {FaceBox}  from "@/components/FaceBox";
+import { SPKRBackground, EnergyOrbs, AudioLighting } from "@/components/SPKRBackground";
 import * as THREE from "three";
 import { useGLTF } from '@react-three/drei'
 
@@ -72,10 +73,21 @@ export default function SPKR({
         gl.outputColorSpace = THREE.SRGBColorSpace;
         gl.toneMapping = THREE.ACESFilmicToneMapping;
       }}
-      style={{ height: "100vh", background: "linear-gradient(to top, #43a565ff, #1eaf51ff, #6cb67bff, #0d7d07ff)" }}
+      style={{ height: "100vh", background: "linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%)" }}
     >
-      <ambientLight intensity={0.7} />
-      <pointLight position={[10, 10, 10]} intensity={60} />
+      {/* Interactive Background Effects */}
+      {/* <SPKRBackground particleCount={1500} /> */}
+      <EnergyOrbs />
+      
+      {/* Colorful fog effect */}
+      <fog attach="fog" args={['#ff89b0ff', 20, 100]} />
+      
+      {/* Lighting */}
+      <ambientLight intensity={1.8} color="#fff0f5" />
+      <AudioLighting />
+      <pointLight position={[10, 10, 10]} intensity={60} color="#ff6b9d" />
+      <pointLight position={[-10, -5, -10]} intensity={40} color="#c471ed" />
+      <pointLight position={[0, -10, 5]} intensity={50} color="#10dbffff" />
       
       {/* Background plane for deselection */}
       <BackgroundPlane onFaceSelect={onFaceSelect} />
@@ -95,7 +107,10 @@ export default function SPKR({
         scale={[3, 3, 3]}
         position={[0, 0, 0.35]} // Adjusted position for woofer
       />
-      <OrbitControls />
+      <OrbitControls
+      enablePan={false} 
+      maxPolarAngle={Math.PI / 2}
+      minPolarAngle={Math.PI / 2-0.4}/>
       {/* <Environment preset="city" background /> */}
     </Canvas>
   );

@@ -163,7 +163,7 @@ export default function Home() {
       {/* Main Content */}
       <div className="flex-1 overflow-hidden">
         {/* Main Scene */}
-        <main className="h-full bg-gradient-to-br from-gray-900 to-black relative overflow-hidden">
+        <main className="h-full relative overflow-hidden">
           <div className="absolute inset-0">
             <SPKR 
               speakerState={speakerState} 
@@ -190,20 +190,20 @@ export default function Home() {
           />
           
           {/* Status Bar */}
-          <div className="absolute bottom-4 left-4 right-4 bg-black/20 backdrop-blur-sm rounded-lg p-4 border border-gray-700/50">
-            <div className="flex justify-between items-center text-sm">
-              <div className="flex space-x-4">
-                <span className="text-gray-300">Preset: <span className="text-blue-400 font-medium">{speakerState.currentPreset}</span></span>
-                <span className="text-gray-300">Volume: <span className="text-green-400 font-medium">{speakerState.volume}%</span></span>
-                <span className="text-gray-300">Bass: <span className="text-orange-400 font-medium">{speakerState.bass}%</span></span>
-                <span className="text-gray-300">Treble: <span className="text-purple-400 font-medium">{speakerState.treble}%</span></span>
+          <div className="absolute bottom-2 md:bottom-4 left-2 md:left-4 right-2 md:right-4 bg-black/20 backdrop-blur-sm rounded-lg p-2 md:p-4 shadow-lg z-30">
+            <div className="flex justify-between items-center text-xs md:text-sm">
+              <div className="flex space-x-2 md:space-x-4 overflow-x-auto">
+                <span className="text-gray-300 whitespace-nowrap">Preset: <span className="text-blue-400 font-medium">{speakerState.currentPreset}</span></span>
+                <span className="text-gray-300 whitespace-nowrap">Volume: <span className="text-green-400 font-medium">{speakerState.volume}%</span></span>
+                <span className="text-gray-300 whitespace-nowrap hidden sm:inline">Bass: <span className="text-orange-400 font-medium">{speakerState.bass}%</span></span>
+                <span className="text-gray-300 whitespace-nowrap hidden sm:inline">Treble: <span className="text-purple-400 font-medium">{speakerState.treble}%</span></span>
               </div>
 
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1 md:space-x-2">
                 <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse">
 
                 </div>
-                <span className="text-green-400 font-medium">Connected</span>
+                <span className="text-green-400 font-medium text-xs md:text-sm">Connected</span>
               </div>
             </div>
           </div>

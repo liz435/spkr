@@ -55,10 +55,10 @@ const FaceSelector: React.FC<FaceSelectorProps> = ({
               onClick={() => handleFaceClick(face.id)}
               onMouseEnter={() => onFaceHover?.(face.id)}
               onMouseLeave={() => onFaceHover?.(null)}
-              className={`p-3 rounded-lg text-sm font-medium transition-all duration-200 border-2 ${
+              className={`p-3 rounded-lg text-sm font-medium transition-all duration-200 ${
                 selectedFace === face.id
-                  ? 'bg-blue-600 border-blue-400 text-white shadow-lg'
-                  : 'bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600 hover:border-gray-500'
+                  ? 'bg-blue-600/40 border-none text-white shadow-lg backdrop-blur'
+                  : 'bg-white/20 shadow-lg border-none text-gray-300 hover:bg-gray-600/40'
               }`}
             >
               <span className="block mb-1">{face.icon}</span>
@@ -90,8 +90,8 @@ const FaceSelector: React.FC<FaceSelectorProps> = ({
                   <button
                     key={color.name}
                     onClick={() => onChangeFaceColor(color.name, selectedFace)}
-                    className={`w-12 h-12 rounded-lg ${color.class} ${color.hover} transition-all duration-200 transform hover:scale-110 active:scale-95 shadow-lg border-2 ${
-                      currentFaceColors?.[selectedFace] === color.name ? 'border-white' : 'border-gray-600 hover:border-gray-400'
+                    className={`w-12 h-12 rounded-lg ${color.class} ${color.hover} transition-all duration-200 transform hover:scale-110 active:scale-95 shadow-sm border-2 ${
+                      currentFaceColors?.[selectedFace] === color.name ? 'border-none' : 'border-none hover:border-none'
                     }`}
                     title={`Change ${selectedFace} face to ${color.name}`}
                   />
@@ -106,7 +106,7 @@ const FaceSelector: React.FC<FaceSelectorProps> = ({
             </div>
           </div>
         ) : (
-          <div className="bg-gray-700 rounded-lg p-4 text-center">
+          <div className="bg-black/20 shadow-lg rounded-lg p-4 text-center">
             <p className="text-gray-400 text-sm">
               Select a face above or click on a face in the 3D view
             </p>
