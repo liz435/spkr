@@ -108,6 +108,37 @@ export function FaceBox({
   const sideGeometry = useMemo(() => new THREE.BoxGeometry(thickness, size, size), []);
   const topBottomGeometry = useMemo(() => new THREE.BoxGeometry(1.9, thickness, 2), []);
 
+  // Cable geometries - two cables from speaker to bottom
+  const cable1Geometry = useMemo(() => {
+    const curve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(0.2, 0, 0),     // Start from speaker area
+      new THREE.Vector3(0.2, -0.3, 0),  // Bend down
+      new THREE.Vector3(0.2, -0.75, 0),  // Along the side
+      new THREE.Vector3(0.1, -0.78, -0.4) // To bottom back
+    ]);
+    return new THREE.TubeGeometry(curve, 20, 0.02, 8, false);
+  }, []);
+
+  const cable2Geometry = useMemo(() => {
+    const curve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(-0.2, 0, 0),    // Start from speaker area (other side)
+      new THREE.Vector3(-0.1, -0.3, 0), // Bend down
+      new THREE.Vector3(-0.2, -0.75, 0), // Along the side
+      new THREE.Vector3(-0.2, -0.78, -0.4) // To bottom back
+    ]);
+    return new THREE.TubeGeometry(curve, 20, 0.02, 8, false);
+  }, []);
+
+  // Audio interface geometry - small box at the back
+  const audioInterfaceGeometry = useMemo(() => {
+    return new THREE.BoxGeometry(0.4, 0.15, 0.08);
+  }, []);
+
+  // Audio interface ports (small cylinders)
+  const audioPortGeometry = useMemo(() => {
+    return new THREE.CylinderGeometry(0.015, 0.015, 0.05, 8);
+  }, []);
+
   const faces = [
     { id: "front", geometry: frontGeometry, position: [0, 0.1, size / 2 - thickness/2] },
     { id: "back", geometry: backGeometry, position: [0, 0.1, -size / 2 + thickness/2] },
@@ -151,6 +182,59 @@ return (
           />
         </a.group>
       ))}
+      
+      {/* Cable 1 */}
+      <mesh geometry={cable1Geometry} position={[-0.1, 0.1, 0.75]}>
+        <meshStandardMaterial 
+          color="#1a1a1a" 
+          metalness={0.1}
+          roughness={0.8}
+          emissive="#000000"
+        />
+      </mesh>
+      
+      {/* Cable 2 */}
+      <mesh geometry={cable2Geometry} position={[0.1, 0.1, 0.75]}>
+        <meshStandardMaterial 
+          color="#2a2a2a" 
+          metalness={0.1}
+          roughness={0.8}
+          emissive="#000000"
+        />
+      </mesh>
+      
+      {/* Audio Interface - positioned at the back */}
+      <group position={[0, -0.6, -0.9]}>
+        {/* Main interface body */}
+        <mesh geometry={audioInterfaceGeometry}>
+          <meshStandardMaterial 
+            color="#303030" 
+            metalness={0.7}
+            roughness={0.3}
+          />
+        </mesh>
+        
+        {/* Audio ports */}
+        <mesh geometry={audioPortGeometry} position={[-0.12, 0, 0.05]} rotation={[0, 0, Math.PI/2]}>
+          <meshStandardMaterial color="#000000" metalness={0.9} roughness={0.1} />
+        </mesh>
+        <mesh geometry={audioPortGeometry} position={[0, 0, 0.05]} rotation={[0, 0, Math.PI/2]}>
+          <meshStandardMaterial color="#000000" metalness={0.9} roughness={0.1} />
+        </mesh>
+        <mesh geometry={audioPortGeometry} position={[0.12, 0, 0.05]} rotation={[0, 0, Math.PI/2]}>
+          <meshStandardMaterial color="#000000" metalness={0.9} roughness={0.1} />
+        </mesh>
+        
+        {/* LED indicator */}
+        <mesh position={[0.15, 0.04, 0.045]}>
+          <sphereGeometry args={[0.008, 8, 8]} />
+          <meshStandardMaterial 
+            color="#00ff00" 
+            emissive="#004400"
+            emissiveIntensity={0.5}
+          />
+        </mesh>
+      </group>
     </group>
   );
 
