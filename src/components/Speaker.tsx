@@ -213,7 +213,7 @@ export default function SPKR({
       
       {showObjects.couch && (
         <Model 
-          url="/couch.glb"
+          url="/Couch.glb"
           scale={[0.1, 0.1, 0.1]}
           position={[3, -1.1, 0]}
           materialType={materialType}
