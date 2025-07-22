@@ -5,7 +5,10 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Environment, Fisheye } from "@react-three/drei";
 import { FaceBox } from "@/components/FaceBox";
 import { SPKRBackground, EnergyOrbs, AudioLighting } from "@/components/SPKRBackground";
-import { SceneEnvironment, SceneLighting } from "@/components/SceneEnvironment";
+import { SceneEnvironment, SceneLighting } from "@/components/SceneEnvironmentNew";
+import { ExtremeMotionBlur, SceneTransitionBlur } from "@/components/ExtremeMotionBlur";
+import { VelocityMotionBlur } from "@/components/VelocityMotionBlur";
+import { type TexturePreset } from "@/components/TextureManager";
 import * as THREE from "three";
 import { useGLTF } from '@react-three/drei'
 
@@ -106,8 +109,11 @@ export default function SPKR({
   toneMappingExposure = 1.0,
   sceneType = "room",
   wallColor = "#f5f5f5",
+  wallTexture, // New texture prop
   floorType = "wood",
-  showObjects = { speaker: true, couch: true, woofer: true }
+  showObjects = { speaker: true, couch: true, woofer: true },
+  motionBlur = { enabled: true, strength: 0.5 },
+  previousSceneType // New prop for tracking scene transitions
 }: { 
   speakerState: { 
     rotation: number; 
@@ -123,12 +129,18 @@ export default function SPKR({
   toneMappingExposure?: number;
   sceneType?: string;
   wallColor?: string;
+  wallTexture?: TexturePreset | string; // Support both presets and custom paths
   floorType?: string;
   showObjects?: {
     speaker: boolean;
     couch: boolean;
     woofer: boolean;
   };
+  motionBlur?: {
+    enabled: boolean;
+    strength: number;
+  };
+  previousSceneType?: string;
 }) {
   return (
     <Canvas
@@ -173,8 +185,12 @@ export default function SPKR({
       <SceneEnvironment 
         sceneType={sceneType as any}
         wallColor={wallColor}
+        wallTexture={wallTexture} // Pass wall texture
         floorType={floorType as any}
-        roomSize={[20, 8, 20]}
+        width={20}
+        height={8}
+        depth={20}
+        textureScale={3} // Make textures smaller (higher scale = more repetitions)
       />
       
       {/* Scene Lighting */}
@@ -208,32 +224,37 @@ export default function SPKR({
           position={faceBoxPosition}
           materialType={materialType}
           renderingMode={renderingMode}
+          showWoofer={showObjects.woofer}
+          wooferPosition={[0, 0, 0.33]}
+          wooferScale={[3, 3, 3]}
         />
       )}
       
       {showObjects.couch && (
         <Model 
           url="/Couch.glb"
+          rotation={[0, Math.PI, 0]}
           scale={[0.1, 0.1, 0.1]}
-          position={[3, -1.1, 0]}
+          position={[6, -1.5, 0]}
           materialType={materialType}
           renderingMode={renderingMode}
         />
       )}
       
-      {showObjects.woofer && (
-        <Model 
-          url="/woofer1.glb"
-          scale={[3, 3, 3]}
-          position={[-3, 0, 0.35]} // Adjusted position for woofer
-          materialType={materialType}
-          renderingMode={renderingMode}
-        />
-      )}
       <OrbitControls
-      enablePan={false} 
+      enablePan={true} 
       maxPolarAngle={Math.PI / 2}
       minPolarAngle={Math.PI / 2-0.4}/>
+      
+      {/* Velocity-Based Motion Blur (John Chapman method) */}
+      {motionBlur.enabled && (
+        <VelocityMotionBlur 
+          enabled={true}
+          intensity={motionBlur.strength}
+          pattern="all" // Use combined patterns for extreme effect
+          sceneTransition={sceneType !== previousSceneType && previousSceneType !== undefined}
+        />
+      )}
       {/* <Environment preset="city" background /> */}
     </Canvas>
   );

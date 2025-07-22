@@ -3,6 +3,7 @@ import * as THREE from "three";
 import { CSG } from "three-csg-ts";
 import Face from "@/components/Face";
 import { useSpring, a } from "@react-spring/three";
+import { Model } from "@/components/Speaker";
 
 function createEdges(geometry: THREE.BufferGeometry) {
   return new THREE.EdgesGeometry(geometry);
@@ -17,7 +18,10 @@ export function FaceBox({
   selectedFace,
   position = [0, 0, 0], // 新增position参数，默认为原点
   materialType = "physical",
-  renderingMode = "realistic"
+  renderingMode = "realistic",
+  showWoofer = true,
+  wooferPosition = [3, 0, 0],
+  wooferScale = [1, 1, 1]
 }: { 
   rotation: number; 
   color: string;
@@ -28,6 +32,9 @@ export function FaceBox({
   position?: [number, number, number];
   materialType?: string;
   renderingMode?: string;
+  showWoofer?: boolean;
+  wooferPosition?: [number, number, number];
+  wooferScale?: [number, number, number];
 }) {
   const size = 2;
   const thickness = 0.05; // 更薄的板材厚度
@@ -181,6 +188,17 @@ export function FaceBox({
           />
         </mesh>
       </group>
+      
+      {/* Woofer as child component */}
+      {showWoofer && (
+        <Model 
+          url="/woofer1.glb"
+          scale={wooferScale}
+          position={wooferPosition}
+          materialType={materialType}
+          renderingMode={renderingMode}
+        />
+      )}
     </group>
   );
 }

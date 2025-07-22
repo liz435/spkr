@@ -3,6 +3,7 @@ import FaceSelector from './FaceSelector';
 import { PositionControls } from './PositionControls';
 import { RenderingControls } from './RenderingControls';
 import { SceneControls } from './SceneControls';
+import { MotionBlurControls } from './MotionBlurControls';
 
 interface FloatingCardsProps {
   onChangeSpeakerColor: (color: string) => void;
@@ -27,6 +28,8 @@ interface FloatingCardsProps {
   onSceneTypeChange?: (type: string) => void;
   wallColor?: string;
   onWallColorChange?: (color: string) => void;
+  wallTexture?: string; // 新增纹理属性
+  onWallTextureChange?: (texture: string) => void; // 新增纹理更改函数
   floorType?: string;
   onFloorTypeChange?: (type: string) => void;
   showObjects?: {
@@ -35,6 +38,11 @@ interface FloatingCardsProps {
     woofer: boolean;
   };
   onObjectToggle?: (object: string, visible: boolean) => void;
+  // Motion blur controls
+  motionBlurEnabled?: boolean;
+  onMotionBlurToggle?: (enabled: boolean) => void;
+  motionBlurStrength?: number;
+  onMotionBlurStrengthChange?: (strength: number) => void;
 }
 
 const FloatingCards: React.FC<FloatingCardsProps> = ({
@@ -58,10 +66,16 @@ const FloatingCards: React.FC<FloatingCardsProps> = ({
   onSceneTypeChange,
   wallColor = "#f5f5f5",
   onWallColorChange,
+  wallTexture = "white-plaster", // 默认纹理
+  onWallTextureChange, // 纹理更改处理函数
   floorType = "wood",
   onFloorTypeChange,
   showObjects = { speaker: true, couch: true, woofer: true },
   onObjectToggle,
+  motionBlurEnabled = false,
+  onMotionBlurToggle,
+  motionBlurStrength = 0.5,
+  onMotionBlurStrengthChange,
 }) => {
   const [embedType, setEmbedType] = useState<'track' | 'playlist' | 'album'>('playlist');
   
@@ -166,6 +180,18 @@ const FloatingCards: React.FC<FloatingCardsProps> = ({
         </div>
       )}
 
+      {/* Motion Blur Controls Card - Left side, below rendering controls */}
+      {onMotionBlurToggle && onMotionBlurStrengthChange && (
+        <div className="absolute bottom-20 left-2 md:left-6 w-64 bg-black/20 backdrop-blur-md rounded-2xl p-3 md:p-4 border border-white/10 shadow-2xl pointer-events-auto">
+          <MotionBlurControls
+            motionBlurEnabled={motionBlurEnabled}
+            motionBlurStrength={motionBlurStrength}
+            onMotionBlurToggle={onMotionBlurToggle}
+            onMotionBlurStrengthChange={onMotionBlurStrengthChange}
+          />
+        </div>
+      )}
+
       {/* Scene Controls Card - Right side */}
       {onSceneTypeChange && (
         <div className="absolute top-1/2 right-2 md:right-6 transform -translate-y-1/2 w-64 pointer-events-auto">
@@ -174,6 +200,8 @@ const FloatingCards: React.FC<FloatingCardsProps> = ({
             onSceneTypeChange={onSceneTypeChange}
             wallColor={wallColor}
             onWallColorChange={onWallColorChange}
+            wallTexture={wallTexture} // 传递纹理参数
+            onWallTextureChange={onWallTextureChange} // 传递纹理更改函数
             floorType={floorType}
             onFloorTypeChange={onFloorTypeChange}
             showObjects={showObjects}

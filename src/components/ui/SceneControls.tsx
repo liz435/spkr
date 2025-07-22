@@ -1,12 +1,15 @@
 'use client'
 
 import React from 'react';
+import { type TexturePreset } from '../TextureManager';
 
 interface SceneControlsProps {
   sceneType: string;
   onSceneTypeChange: (type: string) => void;
   wallColor: string;
   onWallColorChange?: (color: string) => void;
+  wallTexture?: TexturePreset | string; // 新增纹理属性
+  onWallTextureChange?: (texture: TexturePreset | string) => void; // 新增纹理更改函数
   floorType: string;
   onFloorTypeChange?: (type: string) => void;
   showObjects: {
@@ -22,6 +25,8 @@ export function SceneControls({
   onSceneTypeChange,
   wallColor,
   onWallColorChange,
+  wallTexture = "white-plaster", // 默认纹理
+  onWallTextureChange, // 纹理更改处理函数
   floorType,
   onFloorTypeChange,
   showObjects,
@@ -93,6 +98,34 @@ export function SceneControls({
                   style={{ backgroundColor: color.value }}
                   title={color.name}
                 />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Wall Texture (only for room scene) */}
+        {sceneType === 'room' && onWallTextureChange && (
+          <div>
+            <label className="text-white/80 text-sm block mb-2">🎨 Wall Texture</label>
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { name: "Plaster", value: "white-plaster", icon: "🏠" },
+                { name: "Concrete", value: "concrete", icon: "🧱" },
+                { name: "Brick PBR", value: "brick", icon: "🧱" },
+                { name: "Wood PBR", value: "wood-panels", icon: "🪵" } // 更新为Wood PBR
+              ].map((texture) => (
+                <button
+                  key={texture.value}
+                  onClick={() => onWallTextureChange?.(texture.value)}
+                  className={`px-3 py-2 rounded-lg text-sm transition-colors ${
+                    wallTexture === texture.value
+                      ? 'bg-blue-500/30 border border-blue-400/50 text-white'
+                      : 'bg-white/10 border border-white/20 text-white/80 hover:bg-white/20'
+                  }`}
+                >
+                  <span className="mr-1">{texture.icon}</span>
+                  {texture.name}
+                </button>
               ))}
             </div>
           </div>

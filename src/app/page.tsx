@@ -17,7 +17,7 @@ export default function Home() {
   });
   const [selectedFace, setSelectedFace] = useState<string | null>(null);
   const [hoveredFace, setHoveredFace] = useState<string | null>(null);
-  const [faceBoxPosition, setFaceBoxPosition] = useState<[number, number, number]>([0, 0, 0]);
+  const [faceBoxPosition, setFaceBoxPosition] = useState<[number, number, number]>([-3, 0, 0]);
   
   // Rendering controls state
   const [environmentMap, setEnvironmentMap] = useState("city");
@@ -27,13 +27,26 @@ export default function Home() {
   
   // Scene controls state
   const [sceneType, setSceneType] = useState("room");
+  const [previousSceneType, setPreviousSceneType] = useState<string>();
   const [wallColor, setWallColor] = useState("#f5f5f5");
+  const [wallTexture, setWallTexture] = useState("white-plaster"); // 新增纹理状态
   const [floorType, setFloorType] = useState("wood");
   const [showObjects, setShowObjects] = useState({
     speaker: true,
     couch: true,
     woofer: true
   });
+  
+  // Motion blur state
+  const [motionBlurEnabled, setMotionBlurEnabled] = useState(false);
+  const [motionBlurStrength, setMotionBlurStrength] = useState(0.5);
+
+  // Handle scene type changes with tracking
+  const handleSceneTypeChange = (newSceneType: string) => {
+    console.log(`🎬 SCENE CHANGE: ${sceneType} → ${newSceneType}`);
+    setPreviousSceneType(sceneType);
+    setSceneType(newSceneType);
+  };
 
   const rotateSpeaker = () => {
     setSpeakerState((prev) => ({ ...prev, rotation: prev.rotation + Math.PI / 4 }));
@@ -202,8 +215,14 @@ export default function Home() {
               toneMappingExposure={toneMappingExposure}
               sceneType={sceneType}
               wallColor={wallColor}
+              wallTexture={wallTexture} // 传递纹理参数
               floorType={floorType}
               showObjects={showObjects}
+              motionBlur={{
+                enabled: motionBlurEnabled,
+                strength: motionBlurStrength
+              }}
+              previousSceneType={previousSceneType}
             />
           </div>
 
@@ -233,13 +252,19 @@ export default function Home() {
             toneMappingExposure={toneMappingExposure}
             onToneMappingExposureChange={setToneMappingExposure}
             sceneType={sceneType}
-            onSceneTypeChange={setSceneType}
+            onSceneTypeChange={handleSceneTypeChange}
             wallColor={wallColor}
             onWallColorChange={setWallColor}
+            wallTexture={wallTexture} // 传递纹理状态
+            onWallTextureChange={setWallTexture} // 传递纹理更改函数
             floorType={floorType}
             onFloorTypeChange={setFloorType}
             showObjects={showObjects}
             onObjectToggle={handleObjectToggle}
+            motionBlurEnabled={motionBlurEnabled}
+            onMotionBlurToggle={setMotionBlurEnabled}
+            motionBlurStrength={motionBlurStrength}
+            onMotionBlurStrengthChange={setMotionBlurStrength}
           />
           
           {/* Status Bar */}
