@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useMemo } from "react";
 import * as THREE from "three";
 import { CSG } from "three-csg-ts";
 import Face from "@/components/Face";
@@ -13,16 +13,22 @@ export function FaceBox({
   color, 
   faceColors, 
   onFaceSelect,
-  hoveredFace 
+  hoveredFace,
+  selectedFace,
+  position = [0, 0, 0], // 新增position参数，默认为原点
+  materialType = "physical",
+  renderingMode = "realistic"
 }: { 
   rotation: number; 
   color: string;
   faceColors?: { [key: string]: string };
   onFaceSelect?: (faceId: string) => void;
   hoveredFace?: string | null;
+  selectedFace?: string | null;
+  position?: [number, number, number];
+  materialType?: string;
+  renderingMode?: string;
 }) {
-  const [selectedFace, setSelectedFace] = useState<string | null>(null);
-
   const size = 2;
   const thickness = 0.05; // 更薄的板材厚度
 
@@ -32,53 +38,9 @@ export function FaceBox({
     config: { duration: 500 },
   });
 
-  // Handle external deselection (when clicking outside)
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      
-      // Check if clicking on sidebar or other UI elements
-      if (target.closest('aside') || target.closest('header') || target.closest('nav') || target.closest('button')) {
-        return; // Don't deselect if clicking on UI elements
-      }
-      
-      // Check if clicking on the canvas but not on a face
-      if (target.tagName === 'CANVAS') {
-        // Let the background plane handle canvas clicks
-        return;
-      }
-      
-      // If clicking completely outside the 3D area, deselect
-      if (!target.closest('main') && selectedFace) {
-        setSelectedFace(null);
-        onFaceSelect?.('');
-        console.log('Face deselected by clicking outside main area');
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [selectedFace, onFaceSelect]);
-
+  // Simple pass-through function for external face selection (from cards)
   const handleFaceSelect = (faceId: string) => {
-    // If empty string is passed, deselect
-    if (faceId === '') {
-      setSelectedFace(null);
-      onFaceSelect?.('');
-      console.log('Face deselected');
-      return;
-    }
-    
-    // If the same face is clicked again, deselect it
-    if (selectedFace === faceId) {
-      setSelectedFace(null);
-      onFaceSelect?.('');
-      console.log(`Face ${faceId} deselected`);
-    } else {
-      setSelectedFace(faceId);
-      onFaceSelect?.(faceId);
-      console.log(`Selected face: ${faceId}`);
-    }
+    onFaceSelect?.(faceId);
   };
 
   const frontGeometry = useMemo(() => {
@@ -148,37 +110,21 @@ export function FaceBox({
     { id: "bottom", geometry: topBottomGeometry, position: [0, -size / 2 + thickness/2 +0.2, 0] },
   ];
 
-return (
-    <group rotation={[0, rotation, 0]}>
-      {/* Invisible bounding box for better click detection */}
-      <mesh
-        position={[0, 0, 0]}
-        scale={[size + 0.2, size + 0.2, size + 0.2]}
-        onClick={(e) => {
-          e.stopPropagation();
-          // Only deselect if clicking on the bounding box but not on a face
-          if (selectedFace) {
-            setSelectedFace(null);
-            onFaceSelect?.('');
-            console.log('Deselected by clicking bounding box');
-          }
-        }}
-      >
-        <boxGeometry />
-        <meshBasicMaterial transparent opacity={0} />
-      </mesh>
-      
-      {faces.map(({ id, geometry, position }) => (
-        <a.group key={id} position={position as [number, number, number]}>
+  return (
+    <group rotation={[0, rotation, 0]} position={position}>      
+      {faces.map(({ id, geometry, position: facePosition }) => (
+        <a.group key={id} position={facePosition as [number, number, number]}>
           <Face
             id={id}
             geometry={geometry}
             position={[0, 0, 0]}
             color={spring.color}
-            selectedFace={selectedFace}
+            selectedFace={selectedFace || null}
             onSelect={handleFaceSelect}
             faceColor={faceColors?.[id]}
             hoveredFace={hoveredFace}
+            materialType={materialType}
+            renderingMode={renderingMode}
           />
         </a.group>
       ))}
@@ -237,5 +183,4 @@ return (
       </group>
     </group>
   );
-
 }

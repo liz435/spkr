@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo } from "react";
 import * as THREE from "three";
 import { a, useSpring } from "@react-spring/three";
 
@@ -12,6 +12,8 @@ type FaceProps = {
   onSelect: (id: string) => void;
   faceColor?: string; // Individual face color
   hoveredFace?: string | null; // External hover state from sidebar
+  materialType?: string;
+  renderingMode?: string;
 };
 
 export const Face = React.memo(function Face({
@@ -24,9 +26,9 @@ export const Face = React.memo(function Face({
   onSelect,
   faceColor,
   hoveredFace,
+  materialType = "physical",
+  renderingMode = "realistic",
 }: FaceProps) {
-  const [hovered, setHovered] = useState(false);
-
   // Create simple outline for face selection highlighting
   const outlineEdges = useMemo(() => {
     // Instead of using complex edge detection, create a simple wireframe outline
@@ -63,45 +65,18 @@ export const Face = React.memo(function Face({
   const isSelected = selectedFace === id;
   const isHoveredFromSidebar = hoveredFace === id;
 
-  // Clear hover state when face is deselected
-  useEffect(() => {
-    if (selectedFace === null) {
-      setHovered(false);
-    }
-  }, [selectedFace]);
-
   // Individual face color animation
   const { faceColorSpring } = useSpring({
     faceColorSpring: faceColor || color,
     config: { duration: 300 }
   });
 
-  // Hover and selection effects - include sidebar hover
+  // Selection effects - only for external selection (from cards)
   const { scale, opacity } = useSpring({
-    scale: isSelected ? 1.05 : (hovered || isHoveredFromSidebar) ? 1.02 : 1,
-    opacity: (hovered || isHoveredFromSidebar) ? 0.9 : 0.8,
+    scale: isSelected ? 1.05 : isHoveredFromSidebar ? 1.02 : 1,
+    opacity: isHoveredFromSidebar ? 0.9 : 0.8,
     config: { tension: 300, friction: 30 }
   });
-
-  const handleClick = (e: any) => {
-    e.stopPropagation();
-    console.log(`Face ${id} clicked`);
-    onSelect(id);
-  };
-
-  const handlePointerOver = (e: any) => {
-    e.stopPropagation();
-    if (!isSelected) {
-      setHovered(true);
-      document.body.style.cursor = 'pointer';
-    }
-  };
-
-  const handlePointerOut = (e: any) => {
-    e.stopPropagation();
-    setHovered(false);
-    document.body.style.cursor = 'default';
-  };
 
   return (
     <a.group scale={scale}>
@@ -109,38 +84,90 @@ export const Face = React.memo(function Face({
         geometry={geometry}
         position={position}
         rotation={rotation}
-        onClick={handleClick}
-        onPointerOver={handlePointerOver}
-        onPointerOut={handlePointerOut}
-        // Improve click detection
-        onPointerDown={(e) => e.stopPropagation()}
-        onPointerUp={(e) => e.stopPropagation()}
+        // Remove all click and hover event handlers
       >
-        <a.meshPhysicalMaterial
-          color={faceColor ? faceColorSpring : color}
-          transmission={1}            // 全透光
-          transparent={true}
-          opacity={1}                 // 设置为 1 因为 transmission 会控制透明度
-          roughness={0.2}             // 更毛玻璃
-          metalness={0}
-          ior={1}                  // 更接近亚克力塑料
-          thickness={0.5}             // 更厚折射效果更明显
-          clearcoat={1.5}
-          clearcoatRoughness={0.1}
-          envMapIntensity={1.5}
-          blending={THREE.NormalBlending}
-        />
+        {/* Material based on type */}
+        {materialType === "physical" && (
+          <a.meshPhysicalMaterial
+            color={faceColor ? faceColorSpring : color}
+            transmission={renderingMode === "wireframe" ? 0 : 0.9}
+            transparent={true}
+            opacity={renderingMode === "wireframe" ? 0.3 : 0.9}
+            roughness={0.2}
+            metalness={0}
+            ior={1.05}
+            thickness={0.1}
+            emissiveIntensity={0.5}
+            side={THREE.DoubleSide}
+            depthWrite={false}
+            depthTest={true}
+            attenuationColor={faceColor ? faceColorSpring : color}
+            attenuationDistance={0.5}
+            iridescence={0.3}
+            iridescenceIOR={1.5}
+            iridescenceThicknessRange={[100, 300]}
+            wireframe={renderingMode === "wireframe"}
+          />
+        )}
+        
+        {materialType === "standard" && (
+          <a.meshStandardMaterial
+            color={faceColor ? faceColorSpring : color}
+            transparent={renderingMode !== "wireframe"}
+            opacity={renderingMode === "wireframe" ? 1 : 0.8}
+            roughness={0.5}
+            metalness={0.2}
+            side={THREE.DoubleSide}
+            wireframe={renderingMode === "wireframe"}
+          />
+        )}
+        
+        {materialType === "lambert" && (
+          <a.meshLambertMaterial
+            color={faceColor ? faceColorSpring : color}
+            transparent={renderingMode !== "wireframe"}
+            opacity={renderingMode === "wireframe" ? 1 : 0.7}
+            side={THREE.DoubleSide}
+            wireframe={renderingMode === "wireframe"}
+          />
+        )}
+        
+        {materialType === "phong" && (
+          <a.meshPhongMaterial
+            color={faceColor ? faceColorSpring : color}
+            transparent={renderingMode !== "wireframe"}
+            opacity={renderingMode === "wireframe" ? 1 : 0.8}
+            shininess={100}
+            side={THREE.DoubleSide}
+            wireframe={renderingMode === "wireframe"}
+          />
+        )}
+        
+        {materialType === "toon" && (
+          <a.meshToonMaterial
+            color={faceColor ? faceColorSpring : color}
+            transparent={renderingMode !== "wireframe"}
+            opacity={renderingMode === "wireframe" ? 1 : 0.9}
+            side={THREE.DoubleSide}
+            wireframe={renderingMode === "wireframe"}
+          />
+        )}
+        
+        {materialType === "basic" && (
+          <a.meshBasicMaterial
+            color={faceColor ? faceColorSpring : color}
+            transparent={renderingMode !== "wireframe"}
+            opacity={renderingMode === "wireframe" ? 1 : 0.6}
+            side={THREE.DoubleSide}
+            wireframe={renderingMode === "wireframe"}
+          />
+        )}
         {isSelected && (
           <lineSegments geometry={outlineEdges}>
-            <lineBasicMaterial color="#00ff00" linewidth={3} />
+            <lineBasicMaterial color="#000000ff" linewidth={3} />
           </lineSegments>
         )}
-        {hovered && !isSelected && (
-          <lineSegments geometry={outlineEdges}>
-            <lineBasicMaterial color="#ffff00" linewidth={2} opacity={0.7} transparent />
-          </lineSegments>
-        )}
-        {isHoveredFromSidebar && !isSelected && !hovered && (
+        {isHoveredFromSidebar && !isSelected && (
           <lineSegments geometry={outlineEdges}>
             <lineBasicMaterial color="#00aaff" linewidth={2} opacity={0.8} transparent />
           </lineSegments>

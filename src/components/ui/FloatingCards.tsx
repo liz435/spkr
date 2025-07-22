@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import FaceSelector from './FaceSelector';
+import { PositionControls } from './PositionControls';
+import { RenderingControls } from './RenderingControls';
+import { SceneControls } from './SceneControls';
 
 interface FloatingCardsProps {
   onChangeSpeakerColor: (color: string) => void;
@@ -8,6 +11,30 @@ interface FloatingCardsProps {
   currentFaceColors?: { [key: string]: string };
   onFaceSelect?: (faceId: string) => void;
   onFaceHover?: (faceId: string | null) => void;
+  faceBoxPosition?: [number, number, number];
+  onFaceBoxPositionChange?: (position: [number, number, number]) => void;
+  // Rendering controls
+  environmentMap?: string;
+  onEnvironmentMapChange?: (map: string) => void;
+  materialType?: string;
+  onMaterialTypeChange?: (type: string) => void;
+  renderingMode?: string;
+  onRenderingModeChange?: (mode: string) => void;
+  toneMappingExposure?: number;
+  onToneMappingExposureChange?: (exposure: number) => void;
+  // Scene controls
+  sceneType?: string;
+  onSceneTypeChange?: (type: string) => void;
+  wallColor?: string;
+  onWallColorChange?: (color: string) => void;
+  floorType?: string;
+  onFloorTypeChange?: (type: string) => void;
+  showObjects?: {
+    speaker: boolean;
+    couch: boolean;
+    woofer: boolean;
+  };
+  onObjectToggle?: (object: string, visible: boolean) => void;
 }
 
 const FloatingCards: React.FC<FloatingCardsProps> = ({
@@ -17,6 +44,24 @@ const FloatingCards: React.FC<FloatingCardsProps> = ({
   currentFaceColors,
   onFaceSelect,
   onFaceHover,
+  faceBoxPosition = [0, 0, 0],
+  onFaceBoxPositionChange,
+  environmentMap = "city",
+  onEnvironmentMapChange,
+  materialType = "physical",
+  onMaterialTypeChange,
+  renderingMode = "realistic",
+  onRenderingModeChange,
+  toneMappingExposure = 1.0,
+  onToneMappingExposureChange,
+  sceneType = "room",
+  onSceneTypeChange,
+  wallColor = "#f5f5f5",
+  onWallColorChange,
+  floorType = "wood",
+  onFloorTypeChange,
+  showObjects = { speaker: true, couch: true, woofer: true },
+  onObjectToggle,
 }) => {
   const [embedType, setEmbedType] = useState<'track' | 'playlist' | 'album'>('playlist');
   
@@ -93,6 +138,49 @@ const FloatingCards: React.FC<FloatingCardsProps> = ({
           onFaceHover={onFaceHover}
         />
       </div>
+
+      {/* FaceBox Position Controls Card - Left side */}
+      {onFaceBoxPositionChange && (
+        <div className="absolute top-1/2 left-2 md:left-6 transform -translate-y-1/2 w-64 pointer-events-auto">
+          <PositionControls
+            position={faceBoxPosition}
+            onPositionChange={onFaceBoxPositionChange}
+            label="FaceBox"
+          />
+        </div>
+      )}
+
+      {/* Rendering Controls Card - Left side, below position controls */}
+      {onEnvironmentMapChange && (
+        <div className="absolute top-1/2 left-2 md:left-6 transform translate-y-20 w-64 pointer-events-auto">
+          <RenderingControls
+            environmentMap={environmentMap}
+            onEnvironmentMapChange={onEnvironmentMapChange}
+            materialType={materialType}
+            onMaterialTypeChange={onMaterialTypeChange}
+            renderingMode={renderingMode}
+            onRenderingModeChange={onRenderingModeChange}
+            toneMappingExposure={toneMappingExposure}
+            onToneMappingExposureChange={onToneMappingExposureChange}
+          />
+        </div>
+      )}
+
+      {/* Scene Controls Card - Right side */}
+      {onSceneTypeChange && (
+        <div className="absolute top-1/2 right-2 md:right-6 transform -translate-y-1/2 w-64 pointer-events-auto">
+          <SceneControls
+            sceneType={sceneType}
+            onSceneTypeChange={onSceneTypeChange}
+            wallColor={wallColor}
+            onWallColorChange={onWallColorChange}
+            floorType={floorType}
+            onFloorTypeChange={onFloorTypeChange}
+            showObjects={showObjects}
+            onObjectToggle={onObjectToggle}
+          />
+        </div>
+      )}
 
       {/* Speaker Controls Card - Bottom Right on all screens */}
       <div className="absolute bottom-16 md:bottom-20 right-2 md:right-6 w-52 md:w-64 bg-black/20 backdrop-blur-md rounded-2xl p-3 md:p-4 border border-white/10 shadow-2xl pointer-events-auto">
