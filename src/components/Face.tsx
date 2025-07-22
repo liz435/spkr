@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo } from "react";
 import * as THREE from "three";
 import { a, useSpring } from "@react-spring/three";
 
@@ -25,8 +25,6 @@ export const Face = React.memo(function Face({
   faceColor,
   hoveredFace,
 }: FaceProps) {
-  const [hovered, setHovered] = useState(false);
-
   // Create simple outline for face selection highlighting
   const outlineEdges = useMemo(() => {
     // Instead of using complex edge detection, create a simple wireframe outline
@@ -63,45 +61,18 @@ export const Face = React.memo(function Face({
   const isSelected = selectedFace === id;
   const isHoveredFromSidebar = hoveredFace === id;
 
-  // Clear hover state when face is deselected
-  useEffect(() => {
-    if (selectedFace === null) {
-      setHovered(false);
-    }
-  }, [selectedFace]);
-
   // Individual face color animation
   const { faceColorSpring } = useSpring({
     faceColorSpring: faceColor || color,
     config: { duration: 300 }
   });
 
-  // Hover and selection effects - include sidebar hover
+  // Selection effects - only for external selection (from cards)
   const { scale, opacity } = useSpring({
-    scale: isSelected ? 1.05 : (hovered || isHoveredFromSidebar) ? 1.02 : 1,
-    opacity: (hovered || isHoveredFromSidebar) ? 0.9 : 0.8,
+    scale: isSelected ? 1.05 : isHoveredFromSidebar ? 1.02 : 1,
+    opacity: isHoveredFromSidebar ? 0.9 : 0.8,
     config: { tension: 300, friction: 30 }
   });
-
-  const handleClick = (e: any) => {
-    e.stopPropagation();
-    console.log(`Face ${id} clicked`);
-    onSelect(id);
-  };
-
-  const handlePointerOver = (e: any) => {
-    e.stopPropagation();
-    if (!isSelected) {
-      setHovered(true);
-      document.body.style.cursor = 'pointer';
-    }
-  };
-
-  const handlePointerOut = (e: any) => {
-    e.stopPropagation();
-    setHovered(false);
-    document.body.style.cursor = 'default';
-  };
 
   return (
     <a.group scale={scale}>
@@ -109,38 +80,33 @@ export const Face = React.memo(function Face({
         geometry={geometry}
         position={position}
         rotation={rotation}
-        onClick={handleClick}
-        onPointerOver={handlePointerOver}
-        onPointerOut={handlePointerOut}
-        // Improve click detection
-        onPointerDown={(e) => e.stopPropagation()}
-        onPointerUp={(e) => e.stopPropagation()}
+        // Remove all click and hover event handlers
       >
         <a.meshPhysicalMaterial
           color={faceColor ? faceColorSpring : color}
-          transmission={1}            // 全透光
+          transmission={0.7}          // 降低透射，让颜色更明显
           transparent={true}
-          opacity={1}                 // 设置为 1 因为 transmission 会控制透明度
-          roughness={0.2}             // 更毛玻璃
+          opacity={0.9}               // 稍微降低透明度，让重叠时后面颜色更明显
+          roughness={0.2}             
           metalness={0}
-          ior={1}                  // 更接近亚克力塑料
-          thickness={0.5}             // 更厚折射效果更明显
+          ior={1.2}                   // 稍微提高折射率
+          thickness={0.8}             
           clearcoat={1.5}
           clearcoatRoughness={0.1}
-          envMapIntensity={1.5}
-          blending={THREE.NormalBlending}
+          envMapIntensity={1.2}
+          side={THREE.DoubleSide}     
+          depthWrite={false}          // 不写入深度缓冲区，让重叠面都可见
+          depthTest={true}            
+          blending={THREE.AdditiveBlending}  // 使用加法混合，让重叠颜色叠加
+          emissive={faceColor ? faceColorSpring : color}  // 添加发光效果
+          emissiveIntensity={0.1}     // 轻微发光让后面的面更明显
         />
         {isSelected && (
           <lineSegments geometry={outlineEdges}>
             <lineBasicMaterial color="#00ff00" linewidth={3} />
           </lineSegments>
         )}
-        {hovered && !isSelected && (
-          <lineSegments geometry={outlineEdges}>
-            <lineBasicMaterial color="#ffff00" linewidth={2} opacity={0.7} transparent />
-          </lineSegments>
-        )}
-        {isHoveredFromSidebar && !isSelected && !hovered && (
+        {isHoveredFromSidebar && !isSelected && (
           <lineSegments geometry={outlineEdges}>
             <lineBasicMaterial color="#00aaff" linewidth={2} opacity={0.8} transparent />
           </lineSegments>

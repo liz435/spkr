@@ -77,20 +77,20 @@ export default function SPKR({
     >
       {/* Interactive Background Effects */}
       {/* <SPKRBackground particleCount={1500} /> */}
-      <EnergyOrbs />
+      {/* <EnergyOrbs /> */}
       
       {/* Colorful fog effect */}
       <fog attach="fog" args={['#ff89b0ff', 20, 100]} />
       
       {/* Lighting */}
-      <ambientLight intensity={1.8} color="#fff0f5" />
+      <ambientLight intensity={1} color="#fff0f5" />
       <AudioLighting />
       <pointLight position={[10, 10, 10]} intensity={60} color="#ff6b9d" />
       <pointLight position={[-10, -5, -10]} intensity={40} color="#c471ed" />
       <pointLight position={[0, -10, 5]} intensity={50} color="#10dbffff" />
       
       {/* Background plane for deselection */}
-      <BackgroundPlane onFaceSelect={onFaceSelect} />
+      <BackgroundPlane />
       
       <FaceBox 
         rotation={speakerState.rotation} 
