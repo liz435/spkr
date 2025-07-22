@@ -14,7 +14,10 @@ export function FaceBox({
   faceColors, 
   onFaceSelect,
   hoveredFace,
-  selectedFace 
+  selectedFace,
+  position = [0, 0, 0], // 新增position参数，默认为原点
+  materialType = "physical",
+  renderingMode = "realistic"
 }: { 
   rotation: number; 
   color: string;
@@ -22,6 +25,9 @@ export function FaceBox({
   onFaceSelect?: (faceId: string) => void;
   hoveredFace?: string | null;
   selectedFace?: string | null;
+  position?: [number, number, number];
+  materialType?: string;
+  renderingMode?: string;
 }) {
   const size = 2;
   const thickness = 0.05; // 更薄的板材厚度
@@ -105,9 +111,9 @@ export function FaceBox({
   ];
 
   return (
-    <group rotation={[0, rotation, 0]}>      
-      {faces.map(({ id, geometry, position }) => (
-        <a.group key={id} position={position as [number, number, number]}>
+    <group rotation={[0, rotation, 0]} position={position}>      
+      {faces.map(({ id, geometry, position: facePosition }) => (
+        <a.group key={id} position={facePosition as [number, number, number]}>
           <Face
             id={id}
             geometry={geometry}
@@ -117,6 +123,8 @@ export function FaceBox({
             onSelect={handleFaceSelect}
             faceColor={faceColors?.[id]}
             hoveredFace={hoveredFace}
+            materialType={materialType}
+            renderingMode={renderingMode}
           />
         </a.group>
       ))}

@@ -12,6 +12,8 @@ type FaceProps = {
   onSelect: (id: string) => void;
   faceColor?: string; // Individual face color
   hoveredFace?: string | null; // External hover state from sidebar
+  materialType?: string;
+  renderingMode?: string;
 };
 
 export const Face = React.memo(function Face({
@@ -24,6 +26,8 @@ export const Face = React.memo(function Face({
   onSelect,
   faceColor,
   hoveredFace,
+  materialType = "physical",
+  renderingMode = "realistic",
 }: FaceProps) {
   // Create simple outline for face selection highlighting
   const outlineEdges = useMemo(() => {
@@ -82,28 +86,85 @@ export const Face = React.memo(function Face({
         rotation={rotation}
         // Remove all click and hover event handlers
       >
-        <a.meshPhysicalMaterial
-          color={faceColor ? faceColorSpring : color}
-          transmission={0.7}          // 降低透射，让颜色更明显
-          transparent={true}
-          opacity={0.9}               // 稍微降低透明度，让重叠时后面颜色更明显
-          roughness={0.2}             
-          metalness={0}
-          ior={1.2}                   // 稍微提高折射率
-          thickness={0.8}             
-          clearcoat={1.5}
-          clearcoatRoughness={0.1}
-          envMapIntensity={1.2}
-          side={THREE.DoubleSide}     
-          depthWrite={false}          // 不写入深度缓冲区，让重叠面都可见
-          depthTest={true}            
-          blending={THREE.AdditiveBlending}  // 使用加法混合，让重叠颜色叠加
-          emissive={faceColor ? faceColorSpring : color}  // 添加发光效果
-          emissiveIntensity={0.1}     // 轻微发光让后面的面更明显
-        />
+        {/* Material based on type */}
+        {materialType === "physical" && (
+          <a.meshPhysicalMaterial
+            color={faceColor ? faceColorSpring : color}
+            transmission={renderingMode === "wireframe" ? 0 : 0.9}
+            transparent={true}
+            opacity={renderingMode === "wireframe" ? 0.3 : 0.9}
+            roughness={0.2}
+            metalness={0}
+            ior={1.05}
+            thickness={0.1}
+            emissiveIntensity={0.5}
+            side={THREE.DoubleSide}
+            depthWrite={false}
+            depthTest={true}
+            attenuationColor={faceColor ? faceColorSpring : color}
+            attenuationDistance={0.5}
+            iridescence={0.3}
+            iridescenceIOR={1.5}
+            iridescenceThicknessRange={[100, 300]}
+            wireframe={renderingMode === "wireframe"}
+          />
+        )}
+        
+        {materialType === "standard" && (
+          <a.meshStandardMaterial
+            color={faceColor ? faceColorSpring : color}
+            transparent={renderingMode !== "wireframe"}
+            opacity={renderingMode === "wireframe" ? 1 : 0.8}
+            roughness={0.5}
+            metalness={0.2}
+            side={THREE.DoubleSide}
+            wireframe={renderingMode === "wireframe"}
+          />
+        )}
+        
+        {materialType === "lambert" && (
+          <a.meshLambertMaterial
+            color={faceColor ? faceColorSpring : color}
+            transparent={renderingMode !== "wireframe"}
+            opacity={renderingMode === "wireframe" ? 1 : 0.7}
+            side={THREE.DoubleSide}
+            wireframe={renderingMode === "wireframe"}
+          />
+        )}
+        
+        {materialType === "phong" && (
+          <a.meshPhongMaterial
+            color={faceColor ? faceColorSpring : color}
+            transparent={renderingMode !== "wireframe"}
+            opacity={renderingMode === "wireframe" ? 1 : 0.8}
+            shininess={100}
+            side={THREE.DoubleSide}
+            wireframe={renderingMode === "wireframe"}
+          />
+        )}
+        
+        {materialType === "toon" && (
+          <a.meshToonMaterial
+            color={faceColor ? faceColorSpring : color}
+            transparent={renderingMode !== "wireframe"}
+            opacity={renderingMode === "wireframe" ? 1 : 0.9}
+            side={THREE.DoubleSide}
+            wireframe={renderingMode === "wireframe"}
+          />
+        )}
+        
+        {materialType === "basic" && (
+          <a.meshBasicMaterial
+            color={faceColor ? faceColorSpring : color}
+            transparent={renderingMode !== "wireframe"}
+            opacity={renderingMode === "wireframe" ? 1 : 0.6}
+            side={THREE.DoubleSide}
+            wireframe={renderingMode === "wireframe"}
+          />
+        )}
         {isSelected && (
           <lineSegments geometry={outlineEdges}>
-            <lineBasicMaterial color="#00ff00" linewidth={3} />
+            <lineBasicMaterial color="#000000ff" linewidth={3} />
           </lineSegments>
         )}
         {isHoveredFromSidebar && !isSelected && (

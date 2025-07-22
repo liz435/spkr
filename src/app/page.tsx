@@ -17,6 +17,23 @@ export default function Home() {
   });
   const [selectedFace, setSelectedFace] = useState<string | null>(null);
   const [hoveredFace, setHoveredFace] = useState<string | null>(null);
+  const [faceBoxPosition, setFaceBoxPosition] = useState<[number, number, number]>([0, 0, 0]);
+  
+  // Rendering controls state
+  const [environmentMap, setEnvironmentMap] = useState("city");
+  const [materialType, setMaterialType] = useState("physical");
+  const [renderingMode, setRenderingMode] = useState("realistic");
+  const [toneMappingExposure, setToneMappingExposure] = useState(1.0);
+  
+  // Scene controls state
+  const [sceneType, setSceneType] = useState("room");
+  const [wallColor, setWallColor] = useState("#f5f5f5");
+  const [floorType, setFloorType] = useState("wood");
+  const [showObjects, setShowObjects] = useState({
+    speaker: true,
+    couch: true,
+    woofer: true
+  });
 
   const rotateSpeaker = () => {
     setSpeakerState((prev) => ({ ...prev, rotation: prev.rotation + Math.PI / 4 }));
@@ -157,6 +174,15 @@ export default function Home() {
     // TODO: Implement notification panel
   };
 
+  // Scene control handlers
+  const handleObjectToggle = (object: string, visible: boolean) => {
+    setShowObjects(prev => ({
+      ...prev,
+      [object]: visible
+    }));
+    console.log(`${object} visibility: ${visible}`);
+  };
+
 
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-gray-900 via-gray-800 to-black text-gray-100">
@@ -169,6 +195,15 @@ export default function Home() {
               speakerState={speakerState} 
               onFaceSelect={handleFaceSelect}
               hoveredFace={hoveredFace}
+              faceBoxPosition={faceBoxPosition}
+              environmentMap={environmentMap}
+              materialType={materialType}
+              renderingMode={renderingMode}
+              toneMappingExposure={toneMappingExposure}
+              sceneType={sceneType}
+              wallColor={wallColor}
+              floorType={floorType}
+              showObjects={showObjects}
             />
           </div>
 
@@ -187,6 +222,24 @@ export default function Home() {
             currentFaceColors={speakerState.faceColors}
             onFaceSelect={handleFaceSelect}
             onFaceHover={handleFaceHover}
+            faceBoxPosition={faceBoxPosition}
+            onFaceBoxPositionChange={setFaceBoxPosition}
+            environmentMap={environmentMap}
+            onEnvironmentMapChange={setEnvironmentMap}
+            materialType={materialType}
+            onMaterialTypeChange={setMaterialType}
+            renderingMode={renderingMode}
+            onRenderingModeChange={setRenderingMode}
+            toneMappingExposure={toneMappingExposure}
+            onToneMappingExposureChange={setToneMappingExposure}
+            sceneType={sceneType}
+            onSceneTypeChange={setSceneType}
+            wallColor={wallColor}
+            onWallColorChange={setWallColor}
+            floorType={floorType}
+            onFloorTypeChange={setFloorType}
+            showObjects={showObjects}
+            onObjectToggle={handleObjectToggle}
           />
           
           {/* Status Bar */}
