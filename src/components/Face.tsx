@@ -102,6 +102,7 @@ export const Face = React.memo(function Face({
             depthWrite={false}
             depthTest={true}
             blending={THREE.SubtractiveBlending}
+            premultipliedAlpha={true}
             attenuationColor={faceColor ? faceColorSpring : color}
             attenuationDistance={0.5}
             iridescence={0.3}

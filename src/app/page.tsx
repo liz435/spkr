@@ -41,6 +41,11 @@ export default function Home() {
   // Motion blur state
   const [motionBlurEnabled, setMotionBlurEnabled] = useState(false);
   const [motionBlurStrength, setMotionBlurStrength] = useState(0.5);
+  
+  // Post processing state
+  const [postProcessingEnabled, setPostProcessingEnabled] = useState(true);
+  const [bloomStrength, setBloomStrength] = useState(0.4);
+  const [ssaoIntensity, setSSAOIntensity] = useState(0.6);
 
   // Handle scene type changes with tracking
   const handleSceneTypeChange = (newSceneType: string) => {
@@ -223,6 +228,11 @@ export default function Home() {
                 enabled: motionBlurEnabled,
                 strength: motionBlurStrength
               }}
+              postProcessing={{
+                enabled: postProcessingEnabled,
+                bloomStrength: bloomStrength,
+                ssaoIntensity: ssaoIntensity
+              }}
               previousSceneType={previousSceneType}
             />
           </div>
@@ -282,6 +292,14 @@ export default function Home() {
             onRenderingModeChange={setRenderingMode}
             toneMappingExposure={toneMappingExposure}
             onToneMappingExposureChange={setToneMappingExposure}
+            
+            // Post Processing
+            postProcessingEnabled={postProcessingEnabled}
+            onPostProcessingToggle={setPostProcessingEnabled}
+            bloomStrength={bloomStrength}
+            onBloomStrengthChange={setBloomStrength}
+            ssaoIntensity={ssaoIntensity}
+            onSSAOIntensityChange={setSSAOIntensity}
             
             // Scene
             sceneType={sceneType}

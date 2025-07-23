@@ -8,6 +8,10 @@ import { SPKRBackground, EnergyOrbs, AudioLighting } from "@/components/SPKRBack
 import { SceneEnvironment, SceneLighting } from "@/components/SceneEnvironmentNew";
 import { ExtremeMotionBlur, SceneTransitionBlur } from "@/components/ExtremeMotionBlur";
 import { VelocityMotionBlur } from "@/components/VelocityMotionBlur";
+import { RealisticPostProcessing } from "@/components/RealisticPostProcessing";
+import { SimplePostProcessing } from "@/components/SimplePostProcessing";
+import { ModernPostProcessing } from "@/components/ModernPostProcessing";
+import { StablePostProcessing } from "@/components/StablePostProcessing";
 import { type TexturePreset } from "@/components/TextureManager";
 import * as THREE from "three";
 import { useGLTF } from '@react-three/drei'
@@ -113,6 +117,7 @@ export default function SPKR({
   floorType = "wood-floor-pbr", // Default to wood floor PBR
   showObjects = { speaker: true, couch: true, woofer: true },
   motionBlur = { enabled: true, strength: 0.5 },
+  postProcessing = { enabled: true, bloomStrength: 0.4, ssaoIntensity: 0.6 }, // New post processing props
   previousSceneType // New prop for tracking scene transitions
 }: { 
   speakerState: { 
@@ -139,6 +144,11 @@ export default function SPKR({
   motionBlur?: {
     enabled: boolean;
     strength: number;
+  };
+  postProcessing?: {
+    enabled: boolean;
+    bloomStrength: number;
+    ssaoIntensity: number;
   };
   previousSceneType?: string;
 }) {
@@ -255,6 +265,15 @@ export default function SPKR({
           sceneTransition={sceneType !== previousSceneType && previousSceneType !== undefined}
         />
       )}
+      
+      {/* Stable Post Processing Effects (applies to entire scene) */}
+      {postProcessing.enabled && renderingMode === "realistic" && (
+        <StablePostProcessing
+          enabled={postProcessing.enabled}
+          bloomStrength={postProcessing.bloomStrength}
+        />
+      )}
+      
       {/* <Environment preset="city" background /> */}
     </Canvas>
   );

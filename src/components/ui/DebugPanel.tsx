@@ -27,6 +27,14 @@ interface DebugPanelProps {
   toneMappingExposure?: number;
   onToneMappingExposureChange?: (value: number) => void;
   
+  // Post Processing Controls
+  postProcessingEnabled?: boolean;
+  onPostProcessingToggle?: (enabled: boolean) => void;
+  bloomStrength?: number;
+  onBloomStrengthChange?: (value: number) => void;
+  ssaoIntensity?: number;
+  onSSAOIntensityChange?: (value: number) => void;
+  
   // Scene Controls
   sceneType?: string;
   onSceneTypeChange?: (type: string) => void;
@@ -62,6 +70,14 @@ export function DebugPanel({
   onRenderingModeChange,
   toneMappingExposure = 1,
   onToneMappingExposureChange,
+  
+  // Post Processing props
+  postProcessingEnabled = true,
+  onPostProcessingToggle,
+  bloomStrength = 0.4,
+  onBloomStrengthChange,
+  ssaoIntensity = 0.6,
+  onSSAOIntensityChange,
   
   // Scene props
   sceneType = 'room',
@@ -352,6 +368,40 @@ export function DebugPanel({
                   className="w-full accent-purple-500"
                 />
               </div>
+              
+              {/* Post Processing Toggle */}
+              <div className="flex items-center justify-between">
+                <label className="text-white/80 text-sm">✨ Post Processing</label>
+                <button
+                  onClick={() => onPostProcessingToggle?.(!postProcessingEnabled)}
+                  className={`relative w-12 h-6 rounded-full transition-colors ${
+                    postProcessingEnabled ? 'bg-purple-500' : 'bg-gray-600'
+                  }`}
+                >
+                  <div className={`absolute w-5 h-5 bg-white rounded-full top-0.5 transition-transform ${
+                    postProcessingEnabled ? 'translate-x-6' : 'translate-x-0.5'
+                  }`} />
+                </button>
+              </div>
+              
+              {/* Post Processing Controls (only when enabled) */}
+              {postProcessingEnabled && (
+                <>
+                  {/* Bloom Strength */}
+                  <div>
+                    <label className="text-white/80 text-sm block mb-1">Bloom: {bloomStrength.toFixed(2)}</label>
+                    <input
+                      type="range"
+                      min="0"
+                      max="1"
+                      step="0.05"
+                      value={bloomStrength}
+                      onChange={(e) => onBloomStrengthChange?.(parseFloat(e.target.value))}
+                      className="w-full accent-purple-500"
+                    />
+                  </div>
+                </>
+              )}
             </div>
           )}
         </div>
