@@ -109,8 +109,8 @@ export default function SPKR({
   toneMappingExposure = 1.0,
   sceneType = "room",
   wallColor = "#f5f5f5",
-  wallTexture, // New texture prop
-  floorType = "wood",
+  wallTexture = "brick", // Default to brick PBR
+  floorType = "wood-floor-pbr", // Default to wood floor PBR
   showObjects = { speaker: true, couch: true, woofer: true },
   motionBlur = { enabled: true, strength: 0.5 },
   previousSceneType // New prop for tracking scene transitions
@@ -232,10 +232,10 @@ export default function SPKR({
       
       {showObjects.couch && (
         <Model 
-          url="/Couch.glb"
+          url="/Couch_Textured.gltf"
           rotation={[0, Math.PI, 0]}
           scale={[0.1, 0.1, 0.1]}
-          position={[6, -1.5, 0]}
+          position={[6, -4, -7]}
           materialType={materialType}
           renderingMode={renderingMode}
         />

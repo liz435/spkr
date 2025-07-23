@@ -269,6 +269,13 @@ export function SceneEnvironment({
         {createWallMaterial()}
       </mesh>
 
+
+    <mesh position={[0, -3.7, -depth/2+0.1]}>
+        <boxGeometry args={[50, 1, 0.1 ]} />
+        {/* White plaster wall */}
+        <meshLambertMaterial color="#f8f8f8" />
+      </mesh>
+
  
     </group>
   );

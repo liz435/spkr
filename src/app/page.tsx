@@ -4,6 +4,7 @@ import { useState } from "react";
 import FloatingHeader from "@/components/ui/FloatingHeader";
 import FloatingCards from "@/components/ui/FloatingCards";
 import SPKR from "@/components/Speaker";
+import DebugPanel from "@/components/ui/DebugPanel";
 
 export default function Home() {
   const [speakerState, setSpeakerState] = useState({ 
@@ -17,7 +18,7 @@ export default function Home() {
   });
   const [selectedFace, setSelectedFace] = useState<string | null>(null);
   const [hoveredFace, setHoveredFace] = useState<string | null>(null);
-  const [faceBoxPosition, setFaceBoxPosition] = useState<[number, number, number]>([-3, 0, 0]);
+  const [faceBoxPosition, setFaceBoxPosition] = useState<[number, number, number]>([-3, -3, -7]);
   
   // Rendering controls state
   const [environmentMap, setEnvironmentMap] = useState("city");
@@ -29,8 +30,8 @@ export default function Home() {
   const [sceneType, setSceneType] = useState("room");
   const [previousSceneType, setPreviousSceneType] = useState<string>();
   const [wallColor, setWallColor] = useState("#f5f5f5");
-  const [wallTexture, setWallTexture] = useState("white-plaster"); // 新增纹理状态
-  const [floorType, setFloorType] = useState("wood");
+  const [wallTexture, setWallTexture] = useState("brick"); // Default to brick PBR
+  const [floorType, setFloorType] = useState("wood-floor-pbr"); // Default to wood floor PBR
   const [showObjects, setShowObjects] = useState({
     speaker: true,
     couch: true,
@@ -233,7 +234,8 @@ export default function Home() {
             onNotificationToggle={handleNotificationToggle}
           />
 
-          {/* Floating Cards */}
+          {/* Floating Cards - 已替换为 DebugPanel */}
+          
           <FloatingCards 
             onChangeSpeakerColor={changeSpeakerColor}
             onChangeFaceColor={changeFaceColor}
@@ -241,31 +243,8 @@ export default function Home() {
             currentFaceColors={speakerState.faceColors}
             onFaceSelect={handleFaceSelect}
             onFaceHover={handleFaceHover}
-            faceBoxPosition={faceBoxPosition}
-            onFaceBoxPositionChange={setFaceBoxPosition}
-            environmentMap={environmentMap}
-            onEnvironmentMapChange={setEnvironmentMap}
-            materialType={materialType}
-            onMaterialTypeChange={setMaterialType}
-            renderingMode={renderingMode}
-            onRenderingModeChange={setRenderingMode}
-            toneMappingExposure={toneMappingExposure}
-            onToneMappingExposureChange={setToneMappingExposure}
-            sceneType={sceneType}
-            onSceneTypeChange={handleSceneTypeChange}
-            wallColor={wallColor}
-            onWallColorChange={setWallColor}
-            wallTexture={wallTexture} // 传递纹理状态
-            onWallTextureChange={setWallTexture} // 传递纹理更改函数
-            floorType={floorType}
-            onFloorTypeChange={setFloorType}
-            showObjects={showObjects}
-            onObjectToggle={handleObjectToggle}
-            motionBlurEnabled={motionBlurEnabled}
-            onMotionBlurToggle={setMotionBlurEnabled}
-            motionBlurStrength={motionBlurStrength}
-            onMotionBlurStrengthChange={setMotionBlurStrength}
           />
+         
           
           {/* Status Bar */}
           <div className="absolute bottom-2 md:bottom-4 left-2 md:left-4 right-2 md:right-4 bg-black/20 backdrop-blur-sm rounded-lg p-2 md:p-4 shadow-lg z-30">
@@ -285,6 +264,35 @@ export default function Home() {
               </div>
             </div>
           </div>
+
+          {/* Debug Panel - 统一的调试控制面板 */}
+          <DebugPanel
+            // Motion Blur
+            motionBlurIntensity={motionBlurStrength}
+            onMotionBlurIntensityChange={setMotionBlurStrength}
+            
+            // Face Box Position
+            faceBoxPosition={faceBoxPosition}
+            onFaceBoxPositionChange={setFaceBoxPosition}
+            
+            // Rendering
+            materialType={materialType}
+            onMaterialTypeChange={setMaterialType}
+            renderingMode={renderingMode}
+            onRenderingModeChange={setRenderingMode}
+            toneMappingExposure={toneMappingExposure}
+            onToneMappingExposureChange={setToneMappingExposure}
+            
+            // Scene
+            sceneType={sceneType}
+            onSceneTypeChange={handleSceneTypeChange}
+            wallColor={wallColor}
+            onWallColorChange={setWallColor}
+            wallTexture={wallTexture}
+            onWallTextureChange={setWallTexture}
+            floorType={floorType}
+            onFloorTypeChange={setFloorType}
+          />
         </main>
       </div>
     </div>
