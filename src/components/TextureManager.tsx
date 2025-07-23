@@ -20,14 +20,22 @@ export const TEXTURE_PRESETS = {
   },
   'wood-panels': { 
     type: 'pbr',
-    baseColor: '/texture/wood_floor/Wood_027_basecolor.jpg',
-    normal: '/texture/wood_floor/Wood_027_normal.jpg',
-    roughness: '/texture/wood_floor/Wood_027_roughness.jpg',
-    ao: '/texture/wood_floor/Wood_027_ambientOcclusion.jpg',
-    height: '/texture/wood_floor/Wood_027_height.png'
+    baseColor: '/texture/wood_floor/Wood_Floor_012_basecolor.jpg',
+    normal: '/texture/wood_floor/Wood_Floor_012_normal.jpg',
+    roughness: '/texture/wood_floor/Wood_Floor_012_roughness.jpg',
+    ao: '/texture/wood_floor/Wood_Floor_012_ambientOcclusion.jpg',
+    height: '/texture/wood_floor/Wood_Floor_012_height.png'
   },
   
   // PBR Material Sets (real textures)
+  'wood-floor-pbr': {
+    type: 'pbr',
+    baseColor: '/texture/wood_floor/Wood_Floor_012_basecolor.jpg',
+    normal: '/texture/wood_floor/Wood_Floor_012_normal.jpg',
+    roughness: '/texture/wood_floor/Wood_Floor_012_roughness.jpg',
+    ao: '/texture/wood_floor/Wood_Floor_012_ambientOcclusion.jpg',
+    height: '/texture/wood_floor/Wood_Floor_012_height.png'
+  },
   'brick': {
     type: 'pbr',
     baseColor: '/texture/brick/Brick_Wall_019_basecolor.jpg',

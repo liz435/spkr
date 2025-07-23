@@ -50,6 +50,8 @@ export function SceneControls({
 
   const floorTypes = [
     { name: "Wood", value: "wood", icon: "🪵" },
+    { name: "Wood Panels", value: "wood-panels", icon: "🏠" },
+    { name: "Wood Floor PBR", value: "wood-floor-pbr", icon: "🌳" },
     { name: "Concrete", value: "concrete", icon: "🧱" },
     { name: "Marble", value: "marble", icon: "💎" },
     { name: "Carpet", value: "carpet", icon: "🟫" },

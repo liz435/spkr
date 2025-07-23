@@ -86,7 +86,7 @@ interface SceneEnvironmentProps {
   width?: number;
   height?: number;
   depth?: number;
-  floorType?: 'wood' | 'concrete' | 'marble' | 'carpet';
+  floorType?: 'wood' | 'wood-panels' | 'wood-floor-pbr' | 'concrete' | 'marble' | 'carpet';
   showStats?: boolean;
   cameraPosition?: [number, number, number];
 }
@@ -99,7 +99,7 @@ export function SceneEnvironment({
   width = 25,
   height = 20,
   depth = 15,
-  floorType = 'wood',
+  floorType = 'wood-panels',
   showStats = false,
   cameraPosition = [0, 5, 10]
 }: SceneEnvironmentProps) {
@@ -108,6 +108,9 @@ export function SceneEnvironment({
   
   // Get PBR material configuration
   const pbrConfig = usePBRMaterial(wallTexture || 'white-plaster');
+  
+  // Get PBR material configuration for floor
+  const floorPbrConfig = usePBRMaterial('wood-floor-pbr');
 
   // Create wall material with proper loading
   const createWallMaterial = () => {
@@ -132,6 +135,31 @@ export function SceneEnvironment({
       );
     } else {
       return <meshLambertMaterial color={wallColor} />;
+    }
+  };
+
+  // Create floor material with PBR support
+  const createFloorMaterial = () => {
+    if (floorType === 'wood-floor-pbr' && floorPbrConfig && floorPbrConfig.baseColor && floorPbrConfig.type === 'pbr') {
+      return (
+        <Suspense fallback={<LoadingMaterial color="#D2B48C" />}>
+          <PBRMaterial 
+            pbrConfig={floorPbrConfig} 
+            textureScale={2} // Good scale for floor
+            wallColor="#D2B48C"
+          />
+        </Suspense>
+      );
+    } else if (floorType === 'wood') {
+      return <meshLambertMaterial map={woodTexture} />;
+    } else if (floorType === 'wood-panels') {
+      return <meshStandardMaterial map={woodPanelTexture} roughness={0.7} metalness={0.0} />;
+    } else if (floorType === 'concrete') {
+      return <meshStandardMaterial color="#808080" roughness={0.8} />;
+    } else if (floorType === 'marble') {
+      return <meshPhysicalMaterial color="#f8f8f8" roughness={0.1} metalness={0.1} />;
+    } else {
+      return <meshLambertMaterial color="#8B4513" />;
     }
   };
 
@@ -173,20 +201,66 @@ export function SceneEnvironment({
     return texture;
   }, [width, depth, floorType]);
 
+  // Create wood panel floor texture using TextureManager
+  const woodPanelTexture = useMemo(() => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1024;
+    canvas.height = 1024;
+    const ctx = canvas.getContext('2d')!;
+    
+    // Base wood color
+    ctx.fillStyle = '#D2B48C';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    const panelWidth = 120;
+    const panelHeight = 800; // Long vertical panels
+    
+    // Draw vertical wood panels
+    ctx.strokeStyle = '#8B4513';
+    ctx.lineWidth = 3;
+    
+    for (let x = 0; x < canvas.width; x += panelWidth) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, canvas.height);
+      ctx.stroke();
+    }
+    
+    // Add wood grain (horizontal lines)
+    ctx.globalAlpha = 0.3;
+    ctx.strokeStyle = '#654321';
+    ctx.lineWidth = 1;
+    
+    for (let i = 0; i < 80; i++) {
+      ctx.beginPath();
+      ctx.moveTo(0, i * 13 + Math.random() * 8);
+      ctx.lineTo(canvas.width, i * 13 + Math.random() * 8);
+      ctx.stroke();
+    }
+    
+    // Add wood texture noise
+    ctx.globalAlpha = 0.15;
+    for (let i = 0; i < 8000; i++) {
+      const x = Math.random() * canvas.width;
+      const y = Math.random() * canvas.height;
+      const size = Math.random() * 2;
+      ctx.fillStyle = Math.random() > 0.5 ? '#DEB887' : '#8B7355';
+      ctx.fillRect(x, y, size, size);
+    }
+    
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+    texture.repeat.set(width / 3, depth / 3); // Adjust scale for floor
+    return texture;
+  }, [width, depth]);
+
   const renderRoom = () => (
     <group>
       {/* Floor */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -height/2, 0]}>
         <planeGeometry args={[50, 20]} />
-        {floorType === 'wood' ? (
-          <meshLambertMaterial map={woodTexture} />
-        ) : floorType === 'concrete' ? (
-          <meshStandardMaterial color="#808080" roughness={0.8} />
-        ) : floorType === 'marble' ? (
-          <meshPhysicalMaterial color="#f8f8f8" roughness={0.1} metalness={0.1} />
-        ) : (
-          <meshLambertMaterial color="#8B4513" />
-        )}
+        {createFloorMaterial()}
       </mesh>
 
       {/* Back Wall */}
