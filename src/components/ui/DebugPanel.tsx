@@ -35,6 +35,24 @@ interface DebugPanelProps {
   ssaoIntensity?: number;
   onSSAOIntensityChange?: (value: number) => void;
   
+  // Glitch Filter Controls
+  glitchEnabled?: boolean;
+  onGlitchToggle?: (enabled: boolean) => void;
+  glitchIntensity?: number;
+  onGlitchIntensityChange?: (value: number) => void;
+  glitchSpeed?: number;
+  onGlitchSpeedChange?: (value: number) => void;
+  
+  // Shockwave Filter Controls
+  shockwaveEnabled?: boolean;
+  onShockwaveToggle?: (enabled: boolean) => void;
+  shockwaveIntensity?: number;
+  onShockwaveIntensityChange?: (value: number) => void;
+  shockwaveSize?: number;
+  onShockwaveSizeChange?: (value: number) => void;
+  shockwaveSpeed?: number;
+  onShockwaveSpeedChange?: (value: number) => void;
+  
   // Scene Controls
   sceneType?: string;
   onSceneTypeChange?: (type: string) => void;
@@ -79,6 +97,24 @@ export function DebugPanel({
   ssaoIntensity = 0.6,
   onSSAOIntensityChange,
   
+  // Glitch Filter props
+  glitchEnabled = false,
+  onGlitchToggle,
+  glitchIntensity = 0.5,
+  onGlitchIntensityChange,
+  glitchSpeed = 10.0,
+  onGlitchSpeedChange,
+  
+  // Shockwave Filter props
+  shockwaveEnabled = false,
+  onShockwaveToggle,
+  shockwaveIntensity = 1.0,
+  onShockwaveIntensityChange,
+  shockwaveSize = 0.1,
+  onShockwaveSizeChange,
+  shockwaveSpeed = 1.0,
+  onShockwaveSpeedChange,
+  
   // Scene props
   sceneType = 'room',
   onSceneTypeChange,
@@ -89,7 +125,38 @@ export function DebugPanel({
   floorType = 'wood-floor-pbr',
   onFloorTypeChange,
 }: DebugPanelProps) {
+  // Debug: Check if glitch props are provided
+  console.log('DebugPanel props:', {
+    glitchEnabled,
+    onGlitchToggle: !!onGlitchToggle,
+    glitchIntensity,
+    onGlitchIntensityChange: !!onGlitchIntensityChange,
+    glitchSpeed,
+    onGlitchSpeedChange: !!onGlitchSpeedChange
+  });
+
   const [isVisible, setIsVisible] = useState(false);
+  
+  // Local state for testing if callbacks are not provided
+  const [localGlitchEnabled, setLocalGlitchEnabled] = useState(glitchEnabled);
+  const [localGlitchIntensity, setLocalGlitchIntensity] = useState(glitchIntensity);
+  const [localGlitchSpeed, setLocalGlitchSpeed] = useState(glitchSpeed);
+  
+  const [localShockwaveEnabled, setLocalShockwaveEnabled] = useState(shockwaveEnabled);
+  const [localShockwaveIntensity, setLocalShockwaveIntensity] = useState(shockwaveIntensity);
+  const [localShockwaveSize, setLocalShockwaveSize] = useState(shockwaveSize);
+  const [localShockwaveSpeed, setLocalShockwaveSpeed] = useState(shockwaveSpeed);
+  
+  // Use local state if callbacks are not provided (for testing)
+  const effectiveGlitchEnabled = onGlitchToggle ? glitchEnabled : localGlitchEnabled;
+  const effectiveGlitchIntensity = onGlitchIntensityChange ? glitchIntensity : localGlitchIntensity;
+  const effectiveGlitchSpeed = onGlitchSpeedChange ? glitchSpeed : localGlitchSpeed;
+  
+  const effectiveShockwaveEnabled = onShockwaveToggle ? shockwaveEnabled : localShockwaveEnabled;
+  const effectiveShockwaveIntensity = onShockwaveIntensityChange ? shockwaveIntensity : localShockwaveIntensity;
+  const effectiveShockwaveSize = onShockwaveSizeChange ? shockwaveSize : localShockwaveSize;
+  const effectiveShockwaveSpeed = onShockwaveSpeedChange ? shockwaveSpeed : localShockwaveSpeed;
+
   const [expandedSections, setExpandedSections] = useState({
     motionBlur: false,
     faceBox: false,
@@ -402,6 +469,173 @@ export function DebugPanel({
                   </div>
                 </>
               )}
+              
+              {/* Glitch Filter Section - Independent of Post Processing */}
+              <div className="border-t border-white/10 pt-3">
+                <div className="flex items-center justify-between">
+                  <label className="text-white/80 text-sm">👾 Glitch Filter</label>
+                  <button
+                    onClick={() => {
+                      console.log('Glitch toggle clicked, current state:', effectiveGlitchEnabled);
+                      if (onGlitchToggle) {
+                        onGlitchToggle(!effectiveGlitchEnabled);
+                      } else {
+                        // Fallback to local state for testing
+                        setLocalGlitchEnabled(!effectiveGlitchEnabled);
+                        console.log('Using local state, new value:', !effectiveGlitchEnabled);
+                      }
+                    }}
+                    className={`relative w-12 h-6 rounded-full transition-colors cursor-pointer ${
+                      effectiveGlitchEnabled ? 'bg-red-500' : 'bg-gray-600'
+                    }`}
+                  >
+                    <div className={`absolute w-5 h-5 bg-white rounded-full top-0.5 transition-transform ${
+                      effectiveGlitchEnabled ? 'translate-x-6' : 'translate-x-0.5'
+                    }`} />
+                  </button>
+                </div>
+                
+                {/* Glitch Controls (only when enabled) */}
+                {effectiveGlitchEnabled && (
+                  <div className="mt-3 space-y-3">
+                    <div>
+                      <label className="text-white/80 text-sm block mb-1">Glitch Intensity: {effectiveGlitchIntensity.toFixed(2)}</label>
+                      <input
+                        type="range"
+                        min="0"
+                        max="2"
+                        step="0.1"
+                        value={effectiveGlitchIntensity}
+                        onChange={(e) => {
+                          const newValue = parseFloat(e.target.value);
+                          console.log('Glitch intensity changed:', newValue);
+                          if (onGlitchIntensityChange) {
+                            onGlitchIntensityChange(newValue);
+                          } else {
+                            setLocalGlitchIntensity(newValue);
+                          }
+                        }}
+                        className="w-full accent-red-500"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="text-white/80 text-sm block mb-1">Glitch Speed: {effectiveGlitchSpeed.toFixed(1)}</label>
+                      <input
+                        type="range"
+                        min="0.5"
+                        max="20"
+                        step="0.5"
+                        value={effectiveGlitchSpeed}
+                        onChange={(e) => {
+                          const newValue = parseFloat(e.target.value);
+                          console.log('Glitch speed changed:', newValue);
+                          if (onGlitchSpeedChange) {
+                            onGlitchSpeedChange(newValue);
+                          } else {
+                            setLocalGlitchSpeed(newValue);
+                          }
+                        }}
+                        className="w-full accent-red-500"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              {/* Shockwave Filter Section - Independent of Post Processing */}
+              <div className="border-t border-white/10 pt-3">
+                <div className="flex items-center justify-between">
+                  <label className="text-white/80 text-sm">💥 Shockwave Filter</label>
+                  <button
+                    onClick={() => {
+                      console.log('Shockwave toggle clicked, current state:', effectiveShockwaveEnabled);
+                      if (onShockwaveToggle) {
+                        onShockwaveToggle(!effectiveShockwaveEnabled);
+                      } else {
+                        // Fallback to local state for testing
+                        setLocalShockwaveEnabled(!effectiveShockwaveEnabled);
+                        console.log('Using local state, new value:', !effectiveShockwaveEnabled);
+                      }
+                    }}
+                    className={`relative w-12 h-6 rounded-full transition-colors cursor-pointer ${
+                      effectiveShockwaveEnabled ? 'bg-orange-500' : 'bg-gray-600'
+                    }`}
+                  >
+                    <div className={`absolute w-5 h-5 bg-white rounded-full top-0.5 transition-transform ${
+                      effectiveShockwaveEnabled ? 'translate-x-6' : 'translate-x-0.5'
+                    }`} />
+                  </button>
+                </div>
+                
+                {/* Shockwave Controls (only when enabled) */}
+                {effectiveShockwaveEnabled && (
+                  <div className="mt-3 space-y-3">
+                    <div>
+                      <label className="text-white/80 text-sm block mb-1">Shockwave Intensity: {effectiveShockwaveIntensity.toFixed(2)}</label>
+                      <input
+                        type="range"
+                        min="0"
+                        max="2"
+                        step="0.1"
+                        value={effectiveShockwaveIntensity}
+                        onChange={(e) => {
+                          const newValue = parseFloat(e.target.value);
+                          console.log('Shockwave intensity changed:', newValue);
+                          if (onShockwaveIntensityChange) {
+                            onShockwaveIntensityChange(newValue);
+                          } else {
+                            setLocalShockwaveIntensity(newValue);
+                          }
+                        }}
+                        className="w-full accent-orange-500"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="text-white/80 text-sm block mb-1">Shockwave Size: {effectiveShockwaveSize.toFixed(2)}</label>
+                      <input
+                        type="range"
+                        min="0.01"
+                        max="0.5"
+                        step="0.01"
+                        value={effectiveShockwaveSize}
+                        onChange={(e) => {
+                          const newValue = parseFloat(e.target.value);
+                          console.log('Shockwave size changed:', newValue);
+                          if (onShockwaveSizeChange) {
+                            onShockwaveSizeChange(newValue);
+                          } else {
+                            setLocalShockwaveSize(newValue);
+                          }
+                        }}
+                        className="w-full accent-orange-500"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="text-white/80 text-sm block mb-1">Shockwave Speed: {effectiveShockwaveSpeed.toFixed(1)}</label>
+                      <input
+                        type="range"
+                        min="0.1"
+                        max="3"
+                        step="0.1"
+                        value={effectiveShockwaveSpeed}
+                        onChange={(e) => {
+                          const newValue = parseFloat(e.target.value);
+                          console.log('Shockwave speed changed:', newValue);
+                          if (onShockwaveSpeedChange) {
+                            onShockwaveSpeedChange(newValue);
+                          } else {
+                            setLocalShockwaveSpeed(newValue);
+                          }
+                        }}
+                        className="w-full accent-orange-500"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>

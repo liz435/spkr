@@ -12,6 +12,8 @@ import { RealisticPostProcessing } from "@/components/RealisticPostProcessing";
 import { SimplePostProcessing } from "@/components/SimplePostProcessing";
 import { ModernPostProcessing } from "@/components/ModernPostProcessing";
 import { StablePostProcessing } from "@/components/StablePostProcessing";
+import ShaderFilters from "@/components/ShaderFilters";
+import { NeonStripLight } from "@/components/NeonStripLight";
 import { type TexturePreset } from "@/components/TextureManager";
 import * as THREE from "three";
 import { useGLTF } from '@react-three/drei'
@@ -118,6 +120,8 @@ export default function SPKR({
   showObjects = { speaker: true, couch: true, woofer: true },
   motionBlur = { enabled: true, strength: 0.5 },
   postProcessing = { enabled: true, bloomStrength: 0.4, ssaoIntensity: 0.6 }, // New post processing props
+  glitch = { enabled: false, intensity: 0.5, speed: 10.0 }, // New glitch props
+  shockwave = { enabled: false, intensity: 1.0, size: 0.1, speed: 1.0 }, // New shockwave props
   previousSceneType // New prop for tracking scene transitions
 }: { 
   speakerState: { 
@@ -149,6 +153,19 @@ export default function SPKR({
     enabled: boolean;
     bloomStrength: number;
     ssaoIntensity: number;
+  };
+  // Glitch effect props
+  glitch?: {
+    enabled: boolean;
+    intensity: number;
+    speed: number;
+  };
+  // Shockwave effect props
+  shockwave?: {
+    enabled: boolean;
+    intensity: number;
+    size: number;
+    speed: number;
   };
   previousSceneType?: string;
 }) {
@@ -241,14 +258,27 @@ export default function SPKR({
       )}
       
       {showObjects.couch && (
-        <Model 
-          url="/Couch_Textured.gltf"
-          rotation={[0, Math.PI, 0]}
-          scale={[0.1, 0.1, 0.1]}
-          position={[6, -4, -7]}
-          materialType={materialType}
-          renderingMode={renderingMode}
-        />
+        <>
+          <Model 
+            url="/couch.gltf"
+            rotation={[0, Math.PI, 0]}
+            scale={[0.1, 0.1, 0.1]}
+            position={[6, -4, -7]}
+            materialType={materialType}
+            renderingMode={renderingMode}
+          />
+          
+          {/* Neon Strip Light above the couch */}
+          <NeonStripLight
+            position={[6, 4.5, -10]} // Above the couch (y position higher)
+            width={3}
+            height={0.15}
+            color="#ff3366" // Bright pink/red color
+            intensity={3}
+            emissiveIntensity={2}
+            animated={true}
+          />
+        </>
       )}
       
       <OrbitControls
@@ -273,6 +303,17 @@ export default function SPKR({
           bloomStrength={postProcessing.bloomStrength}
         />
       )}
+      
+      {/* Shader Filters (including Glitch and Shockwave effects) */}
+      <ShaderFilters
+        glitchEnabled={glitch.enabled}
+        glitchIntensity={glitch.intensity}
+        glitchSpeed={glitch.speed}
+        shockwaveEnabled={shockwave.enabled}
+        shockwaveIntensity={shockwave.intensity}
+        shockwaveSize={shockwave.size}
+        shockwaveSpeed={shockwave.speed}
+      />
       
       {/* <Environment preset="city" background /> */}
     </Canvas>

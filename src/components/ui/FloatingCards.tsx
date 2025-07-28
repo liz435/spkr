@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import FaceSelector from './FaceSelector';
 import { PositionControls } from './PositionControls';
 import { RenderingControls } from './RenderingControls';
@@ -77,15 +76,6 @@ const FloatingCards: React.FC<FloatingCardsProps> = ({
   motionBlurStrength = 0.5,
   onMotionBlurStrengthChange,
 }) => {
-  const [embedType, setEmbedType] = useState<'track' | 'playlist' | 'album'>('playlist');
-  
-  // Spotify content IDs
-  const spotifyContent = {
-    track: "4iV5W9uYEdYUVa79Axb7Rh", // Never Gonna Give You Up
-    playlist: "37i9dQZF1DX0XUsuxWHRQd", // RapCaviar
-    album: "4aawyAB9vmqN3uQ7FjRGTy" // Global Warming - Pitbull
-  };
-
   const handleFaceSelect = (faceId: string) => {
     onFaceSelect?.(faceId);
   };
@@ -103,47 +93,9 @@ const FloatingCards: React.FC<FloatingCardsProps> = ({
 
   return (
     <div className="absolute inset-0 z-40 pointer-events-none">
-      {/* Spotify Player Card - Top Right on desktop, Top on mobile */}
-      <div className="absolute top-6 md:top-26 right-2 md:right-6 w-[calc(100vw-1rem)] md:w-[28rem] max-w-md md:max-w-none bg-black/20 backdrop-blur-md rounded-2xl p-3 md:p-4 border border-white/10 shadow-2xl pointer-events-auto">
-        <div className="text-white text-sm font-medium mb-3 flex items-center gap-2">
-          <span className="animate-pulse text-green-400">●</span>
-          Now Playing
-        </div>
-        
-        {/* Spotify Type Selector */}
-        <div className="flex gap-2 mb-4">
-          {(['playlist', 'track', 'album'] as const).map((type) => (
-            <button
-              key={type}
-              onClick={() => setEmbedType(type)}
-              className={`px-2 md:px-3 py-1 rounded-full text-xs font-medium transition-all ${
-                embedType === type 
-                  ? 'bg-green-500 text-black' 
-                  : 'bg-white/10 text-white/70 hover:bg-white/20'
-              }`}
-            >
-              {type.charAt(0).toUpperCase() + type.slice(1)}
-            </button>
-          ))}
-        </div>
-
-        {/* Spotify Embed */}
-        <div className="rounded-xl overflow-hidden">
-          <iframe
-            src={`https://open.spotify.com/embed/${embedType}/${spotifyContent[embedType]}?utm_source=generator&theme=0`}
-            width="100%"
-            height="160"
-            frameBorder="0"
-            allowFullScreen={false}
-            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-            loading="lazy"
-            className="rounded-xl md:h-[160px]"
-          />
-        </div>
-      </div>
-
       {/* Face Selector Card - Left on desktop, Bottom Left on mobile */}
-      <div className="absolute left-2 md:left-4 bottom-32 md:bottom-auto md:top-32 bg-black/20 backdrop-blur-sm rounded-2xl p-3 md:p-4 border border-white/20 shadow-xl pointer-events-auto">
+      <div className="absolute  left-2 md:left-4 bottom-32 md:bottom-auto md:top-32 bg-black/20 backdrop-blur-sm rounded-2xl p-3 md:p-4 border border-white/20 shadow-xl pointer-events-auto"
+>
         <FaceSelector
           selectedFace={selectedFace || null}
           onFaceSelect={handleFaceSelect}

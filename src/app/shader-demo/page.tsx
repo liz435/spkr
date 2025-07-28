@@ -3,7 +3,7 @@
 import React, { useState, Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Box, Sphere, Torus } from '@react-three/drei';
-import ShaderFilters from '../../components/ShaderFilters';
+import ShaderFilters from "@/components/ShaderFilters";
 import ShaderFilterControls from '../../components/ui/ShaderFilterControls';
 
 // Simple animated scene for testing filters
@@ -53,6 +53,27 @@ export default function ShaderFilterDemoPage() {
   const [motionBlurEnabled, setMotionBlurEnabled] = useState(false);
   const [motionBlurStrength, setMotionBlurStrength] = useState(0.5);
   const [motionBlurSamples, setMotionBlurSamples] = useState(8);
+  
+  // New effects states
+  const [waveDistortionEnabled, setWaveDistortionEnabled] = useState(false);
+  const [waveAmplitude, setWaveAmplitude] = useState(0.05);
+  const [waveFrequency, setWaveFrequency] = useState(10.0);
+  const [waveSpeed, setWaveSpeed] = useState(2.0);
+  const [fireEnabled, setFireEnabled] = useState(false);
+  const [fireIntensity, setFireIntensity] = useState(1.0);
+  const [fireScale, setFireScale] = useState(8.0);
+  const [glitchEnabled, setGlitchEnabled] = useState(false);
+  const [glitchIntensity, setGlitchIntensity] = useState(0.5);
+  const [glitchSpeed, setGlitchSpeed] = useState(10.0);
+  const [oilPaintingEnabled, setOilPaintingEnabled] = useState(false);
+  const [oilBrushSize, setOilBrushSize] = useState(3.0);
+  const [oilIntensity, setOilIntensity] = useState(1.0);
+  
+  // Improved Shockwave states
+  const [improvedShockwaveEnabled, setImprovedShockwaveEnabled] = useState(false);
+  const [improvedShockwaveIntensity, setImprovedShockwaveIntensity] = useState(1.0);
+  const [improvedShockwaveWidth, setImprovedShockwaveWidth] = useState(0.1);
+  const [improvedShockwaveStrength, setImprovedShockwaveStrength] = useState(10.0);
 
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
@@ -71,6 +92,23 @@ export default function ShaderFilterDemoPage() {
             motionBlurEnabled={motionBlurEnabled}
             motionBlurStrength={motionBlurStrength}
             motionBlurSamples={motionBlurSamples}
+            waveDistortionEnabled={waveDistortionEnabled}
+            waveAmplitude={waveAmplitude}
+            waveFrequency={waveFrequency}
+            waveSpeed={waveSpeed}
+            fireEnabled={fireEnabled}
+            fireIntensity={fireIntensity}
+            fireScale={fireScale}
+            glitchEnabled={glitchEnabled}
+            glitchIntensity={glitchIntensity}
+            glitchSpeed={glitchSpeed}
+            oilPaintingEnabled={oilPaintingEnabled}
+            oilBrushSize={oilBrushSize}
+            oilIntensity={oilIntensity}
+            improvedShockwaveEnabled={improvedShockwaveEnabled}
+            improvedShockwaveIntensity={improvedShockwaveIntensity}
+            improvedShockwaveWidth={improvedShockwaveWidth}
+            improvedShockwaveStrength={improvedShockwaveStrength}
           />
         </Suspense>
       </Canvas>
@@ -85,6 +123,23 @@ export default function ShaderFilterDemoPage() {
         onMotionBlurChange={setMotionBlurEnabled}
         onMotionBlurStrengthChange={setMotionBlurStrength}
         onMotionBlurSamplesChange={setMotionBlurSamples}
+        onWaveDistortionChange={setWaveDistortionEnabled}
+        onWaveAmplitudeChange={setWaveAmplitude}
+        onWaveFrequencyChange={setWaveFrequency}
+        onWaveSpeedChange={setWaveSpeed}
+        onFireChange={setFireEnabled}
+        onFireIntensityChange={setFireIntensity}
+        onFireScaleChange={setFireScale}
+        onGlitchChange={setGlitchEnabled}
+        onGlitchIntensityChange={setGlitchIntensity}
+        onGlitchSpeedChange={setGlitchSpeed}
+        onOilPaintingChange={setOilPaintingEnabled}
+        onOilBrushSizeChange={setOilBrushSize}
+        onOilIntensityChange={setOilIntensity}
+        onImprovedShockwaveChange={setImprovedShockwaveEnabled}
+        onImprovedShockwaveIntensityChange={setImprovedShockwaveIntensity}
+        onImprovedShockwaveWidthChange={setImprovedShockwaveWidth}
+        onImprovedShockwaveStrengthChange={setImprovedShockwaveStrength}
       />
       
       {/* Info Panel */}
@@ -99,7 +154,7 @@ export default function ShaderFilterDemoPage() {
         fontSize: '14px',
         maxWidth: '300px'
       }}>
-        <h4 style={{ margin: '0 0 10px 0', color: '#00ff88' }}>🎮 Shader Filter Demo</h4>
+        <h4 style={{ margin: '0 0 10px 0', color: '#00ff88' }}>🎮 Advanced Shader Demo</h4>
         <p style={{ margin: '5px 0', fontSize: '12px' }}>
           🖼️ <strong>Edge Detection:</strong> Highlights object edges for artistic effects
         </p>
@@ -107,10 +162,26 @@ export default function ShaderFilterDemoPage() {
           🟫 <strong>Pixelation:</strong> Creates retro pixel-art style rendering
         </p>
         <p style={{ margin: '5px 0', fontSize: '12px' }}>
-          💨 <strong>Motion Blur:</strong> Simulates camera/object movement blur
+          💨 <strong>Motion Blur:</strong> Framebuffer-based blur with camera tracking
+        </p>
+        <p style={{ margin: '5px 0', fontSize: '12px' }}>
+          🌊 <strong>Wave Distortion:</strong> Animated wave effects with customizable frequency
+        </p>
+        <p style={{ margin: '5px 0', fontSize: '12px' }}>
+          🔥 <strong>Fire Effect:</strong> Procedural fire simulation with noise
+        </p>
+        <p style={{ margin: '5px 0', fontSize: '12px' }}>
+          👾 <strong>Glitch Effect:</strong> Digital artifacts and color separation
+        </p>
+        <p style={{ margin: '5px 0', fontSize: '12px' }}>
+          🌈 <strong>Oil Painting:</strong> Artistic brush stroke simulation
+        </p>
+        <p style={{ margin: '5px 0', fontSize: '12px' }}>
+          💥 <strong>Improved Shockwave:</strong> Enhanced ripple distortion with better control
         </p>
         <p style={{ margin: '10px 0 0 0', fontSize: '11px', color: '#aaa' }}>
-          Use the controls on the right to adjust filter parameters or try the presets!
+          🔄 Use the animated objects and orbit controls to test effects. 
+          Try the preset buttons for quick setups!
         </p>
       </div>
     </div>

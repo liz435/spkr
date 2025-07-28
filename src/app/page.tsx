@@ -5,6 +5,7 @@ import FloatingHeader from "@/components/ui/FloatingHeader";
 import FloatingCards from "@/components/ui/FloatingCards";
 import SPKR from "@/components/Speaker";
 import DebugPanel from "@/components/ui/DebugPanel";
+import ShaderFilters from "@/components/ShaderFilters";
 
 export default function Home() {
   const [speakerState, setSpeakerState] = useState({ 
@@ -46,6 +47,17 @@ export default function Home() {
   const [postProcessingEnabled, setPostProcessingEnabled] = useState(true);
   const [bloomStrength, setBloomStrength] = useState(0.4);
   const [ssaoIntensity, setSSAOIntensity] = useState(0.6);
+  
+  // Glitch effect state
+  const [glitchEnabled, setGlitchEnabled] = useState(false);
+  const [glitchIntensity, setGlitchIntensity] = useState(0.5);
+  const [glitchSpeed, setGlitchSpeed] = useState(10.0);
+  
+  // Shockwave effect state
+  const [shockwaveEnabled, setShockwaveEnabled] = useState(false);
+  const [shockwaveIntensity, setShockwaveIntensity] = useState(1.0);
+  const [shockwaveSize, setShockwaveSize] = useState(0.1);
+  const [shockwaveSpeed, setShockwaveSpeed] = useState(1.0);
 
   // Handle scene type changes with tracking
   const handleSceneTypeChange = (newSceneType: string) => {
@@ -233,6 +245,17 @@ export default function Home() {
                 bloomStrength: bloomStrength,
                 ssaoIntensity: ssaoIntensity
               }}
+              glitch={{
+                enabled: glitchEnabled,
+                intensity: glitchIntensity,
+                speed: glitchSpeed
+              }}
+              shockwave={{
+                enabled: shockwaveEnabled,
+                intensity: shockwaveIntensity,
+                size: shockwaveSize,
+                speed: shockwaveSpeed
+              }}
               previousSceneType={previousSceneType}
             />
           </div>
@@ -300,6 +323,24 @@ export default function Home() {
             onBloomStrengthChange={setBloomStrength}
             ssaoIntensity={ssaoIntensity}
             onSSAOIntensityChange={setSSAOIntensity}
+            
+            // Glitch Filter
+            glitchEnabled={glitchEnabled}
+            onGlitchToggle={setGlitchEnabled}
+            glitchIntensity={glitchIntensity}
+            onGlitchIntensityChange={setGlitchIntensity}
+            glitchSpeed={glitchSpeed}
+            onGlitchSpeedChange={setGlitchSpeed}
+            
+            // Shockwave Filter
+            shockwaveEnabled={shockwaveEnabled}
+            onShockwaveToggle={setShockwaveEnabled}
+            shockwaveIntensity={shockwaveIntensity}
+            onShockwaveIntensityChange={setShockwaveIntensity}
+            shockwaveSize={shockwaveSize}
+            onShockwaveSizeChange={setShockwaveSize}
+            shockwaveSpeed={shockwaveSpeed}
+            onShockwaveSpeedChange={setShockwaveSpeed}
             
             // Scene
             sceneType={sceneType}
